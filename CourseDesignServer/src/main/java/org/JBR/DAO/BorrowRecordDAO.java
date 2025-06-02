@@ -1,0 +1,122 @@
+package org.JBR.DAO;
+
+import org.JBR.Sqlite.SQLiteHelper;
+import java.sql.SQLException;
+import java.sql.PreparedStatement;
+import java.util.List;
+import java.util.Map;
+
+public class BorrowRecordDAO {
+    private final SQLiteHelper dbHelper;
+
+    public BorrowRecordDAO(String dbPath) {
+        this.dbHelper = new SQLiteHelper(dbPath);
+    }
+
+    public void close() {
+        dbHelper.close();
+    }
+
+    //* Get all borrow records */
+    public List<Map<String, Object>> getAllBorrowRecords() {
+        try {
+            return dbHelper.executeQuery("SELECT * FROM borrow_records");
+        } catch (SQLException e) {
+            System.err.println("Query All the Records failed: " + e.getMessage());
+            return List.of();
+        }
+    }
+
+    //* Get borrow records by user */
+    public List<Map<String, Object>> getBorrowRecordsByUser(String userId) {
+        try {
+            return dbHelper.executeQuery(
+                "SELECT * FROM borrow_records WHERE user_id = ?", userId);
+        } catch (SQLException e) {
+            System.err.println("Query Borrow Records by User failed: " + e.getMessage());
+            return List.of();
+        }
+    }
+    
+    //* Add the user borrowRecord */
+    public boolean addBorrowRecord(String recordId, String userId, String bookId, String borrowDate, String dueDate) {
+        try {
+            //* Add the user borrowRecord */
+            boolean success = dbHelper.executeTransaction(conn -> {
+                //* 1.Insert the Record */
+                try (PreparedStatement pstmt = conn.prepareStatement(
+                    "INSERT INTO borrow_records (record_id, user_id, book_id, borrow_date, due_date, status) " +
+                    "VALUES (?, ?, ?, ?, ?, 'BORROWED')")) {
+                    pstmt.setString(1, recordId);
+                    pstmt.setString(2, userId);
+                    pstmt.setString(3, bookId);
+                    pstmt.setString(4, borrowDate);
+                    pstmt.setString(5, dueDate);
+                    pstmt.executeUpdate();
+                }
+
+                //* 2.Update the Book Status */
+                try (PreparedStatement pstmt = conn.prepareStatement(
+                    "UPDATE books SET available = FALSE WHERE book_id = ?")) {
+                    pstmt.setString(1, bookId);
+                    pstmt.executeUpdate();
+                }
+                return true;
+            });
+            
+            return success;
+            
+        } catch (Exception e) {
+            System.err.println("Add Records Failed: " + e.getMessage());
+            return false;
+        }
+    }
+
+    //* Update the borrow record */
+    public boolean updateBorrowRecord(String recordId, String userId, String bookId, String borrowDate, String dueDate) {
+        try {
+            boolean success = dbHelper.executeTransaction(conn -> {
+                try (PreparedStatement pstmt = conn.prepareStatement(
+                    "UPDATE borrow_records SET user_id = ?, book_id = ?, borrow_date = ?, due_date = ? WHERE record_id = ?")) {
+                    pstmt.setString(1, userId);
+                    pstmt.setString(2, bookId);
+                    pstmt.setString(3, borrowDate);
+                    pstmt.setString(4, dueDate);
+                    pstmt.setString(5, recordId);
+                    pstmt.executeUpdate();
+                }
+                return true;
+            });
+            return success;
+        } catch (Exception e) {
+            System.err.println("Update Records Failed: " + e.getMessage());
+            return false;
+        }
+    }
+
+    //* Delete the borrow record */
+    public boolean deleteBorrowRecord(String recordId) {
+        try {
+            boolean success = dbHelper.executeTransaction(conn -> {
+                //* 1.Delete the Record */
+                try (PreparedStatement pstmt = conn.prepareStatement(
+                    "DELETE FROM borrow_records WHERE record_id = ?")) {
+                    pstmt.setString(1, recordId);
+                    pstmt.executeUpdate();
+                }
+
+                //* 2.Update the Book Status */
+                try (PreparedStatement pstmt = conn.prepareStatement(
+                    "UPDATE books SET available = TRUE WHERE book_id = (SELECT book_id FROM borrow_records WHERE record_id = ?)")) {
+                    pstmt.setString(1, recordId);
+                    pstmt.executeUpdate();
+                }
+                return true;
+            });
+            return success;
+        } catch (Exception e) {
+            System.err.println("Delete Records Failed: " + e.getMessage());
+            return false;
+        }
+    }
+}

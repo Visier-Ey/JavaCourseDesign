@@ -1,0 +1,174 @@
+package org.JBR.Service;
+
+import org.JBR.DAO.UserDAO;
+import org.JBR.Utils.JwtUtil;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.javalin.http.Context;
+import io.javalin.websocket.WsConfig;
+import java.util.HashMap;
+import java.util.Map;
+
+public class UserController {
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final String DB_PATH = "library.db"; // 数据库路径
+
+    public static void getAllUsers(Context ctx) { 
+        UserDAO userDAO = new UserDAO(DB_PATH);
+        try {
+            // 查询所有用户
+            Map<String, Object> response = new HashMap<>();
+            response.put("users", userDAO.getAllUsers());
+            response.put("success", true);
+            ctx.json(response);
+        } catch (Exception e) {
+            ctx.status(500).json(Map.of("success", false, "message", "Failed to retrieve users: " + e.getMessage()));
+        } finally {
+            userDAO.close();
+        }
+     }
+    public static void createUser(Context ctx) {  }
+    public static void getUser(Context ctx) {  }
+    public static void updateUser(Context ctx) { 
+        UserDAO userDAO = new UserDAO(DB_PATH);
+        try {
+            String userId = ctx.pathParam("id");
+            if (userId == null || userId.isEmpty()) {
+                ctx.status(400).json(createErrorResponse("User ID is required"));
+                return;
+            }
+
+            JsonNode requestBody = objectMapper.readTree(ctx.body());
+            String username = requestBody.path("username").asText();
+            String role = requestBody.path("role").asText();
+            boolean frozen = requestBody.path("frozen").asBoolean(false); // 默认值为false
+
+            // 更新用户信息
+            boolean success = userDAO.updateUser(userId, username, role, frozen);
+            if (success) {
+                ctx.status(200).json(Map.of("success", true, "message", "User updated successfully"));
+            } else {
+                ctx.status(404).json(createErrorResponse("User not found"));
+            }
+        } catch (Exception e) {
+            ctx.status(500).json(createErrorResponse("Failed to update user: " + e.getMessage()));
+        } finally {
+            userDAO.close();
+        }
+     }
+    public static void deleteUser(Context ctx) { 
+        UserDAO userDAO = new UserDAO(DB_PATH);
+        try {
+            String userId = ctx.pathParam("id");
+            if (userId == null || userId.isEmpty()) {
+                ctx.status(400).json(createErrorResponse("User ID is required"));
+                return;
+            }
+
+            boolean success = userDAO.deleteUser(userId);
+            if (success) {
+                ctx.status(200).json(Map.of("success", true, "message", "User deleted successfully"));
+            } else {
+                ctx.status(404).json(createErrorResponse("User not found"));
+            }
+        } catch (Exception e) {
+            ctx.status(500).json(createErrorResponse("Failed to delete user: " + e.getMessage()));
+        } finally {
+            userDAO.close();
+        }
+     }
+    public static void webSocketEvents(WsConfig wsc) {  }
+
+    public static void login(Context ctx) {
+        UserDAO userDAO = new UserDAO(DB_PATH);
+        try {
+            // 解析JSON请求体
+            JsonNode requestBody = objectMapper.readTree(ctx.body());
+            String username = requestBody.path("username").asText();
+            String password = requestBody.path("password").asText();
+
+            // 验证输入
+            if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
+                ctx.status(400).json(createErrorResponse("Username and password are required"));
+                return;
+            }
+
+            // 从数据库查询用户
+            Map<String, Object> user = userDAO.findUserByUsername(username);
+            if (user == null) {
+                ctx.status(401).json(createErrorResponse("Invalid username or password"));
+                return;
+            }
+
+            // 验证密码 (实际项目中应该使用密码哈希验证)
+            if (!userDAO.verifyCredentials(username, password)) {
+                ctx.status(401).json(createErrorResponse("Invalid username or password"));
+                return;
+                
+            }
+
+            // 生成JWT令牌
+            Map<String, Object> response = new HashMap<>();
+            String token = JwtUtil.generateToken(username);
+            response.put("success", true);
+            response.put("token", token);
+            response.put("username", username);
+            response.put("role", user.get("role")); 
+            response.put("message", "Login successful");
+
+            ctx.json(response);
+            
+        } catch (Exception e) {
+            ctx.status(400).json(createErrorResponse("Invalid request: " + e.getMessage()));
+        } finally {
+            userDAO.close();
+        }
+    }
+    // 注册新用户
+    public static void register(Context ctx) {
+        UserDAO userDAO = new UserDAO(DB_PATH);
+        try {
+            JsonNode requestBody = objectMapper.readTree(ctx.body());
+            String username = requestBody.path("username").asText();
+            String password = requestBody.path("password").asText();
+            String role = "Normal"; // 默认角色
+
+            if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
+                ctx.status(400).json(createErrorResponse("Username and password are required"));
+                return;
+            }
+
+            // 检查用户名是否已存在
+            if (userDAO.findUserByUsername(username) != null) {
+                ctx.status(400).json(createErrorResponse("Username already exists"));
+                return;
+            }
+
+            // 生成用户ID (实际项目中可以用UUID)
+            String userId = "U" + System.currentTimeMillis();
+            
+            // 添加用户到数据库 (注意: 实际项目应该存储密码哈希而非明文)
+            boolean success = userDAO.addUser(userId, username, password, role);
+            if (success) {
+                ctx.status(201).json(Map.of(
+                    "success", true,
+                    "message", "User registered successfully"
+                ));
+            } else {
+                ctx.status(500).json(createErrorResponse("Failed to register user"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            ctx.status(400).json(createErrorResponse("Invalid request: " + e.getMessage()));
+        } finally {
+            userDAO.close();
+        }
+    }
+
+    private static Map<String, Object> createErrorResponse(String message) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("error", message);
+        errorResponse.put("success", false);
+        return errorResponse;
+    }
+}

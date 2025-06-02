@@ -1,0 +1,176 @@
+package org.JBR.Sqlite;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * SQLite 数据库操作封装类
+ */
+public class SQLiteHelper {
+    private final String dbPath;
+    private Connection connection;
+
+    /**
+     * 构造函数
+     * @param dbPath 数据库文件路径（相对或绝对路径）
+     */
+    public SQLiteHelper(String dbPath) {
+        this.dbPath = dbPath;
+    }
+
+    /**
+     * 获取数据库连接
+     * @return Connection 对象
+     * @throws SQLException 如果连接失败
+     */
+    public Connection getConnection() throws SQLException {
+        if (connection == null || connection.isClosed()) {
+            connection = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
+            // 启用外键约束
+            try (Statement stmt = connection.createStatement()) {
+                stmt.execute("PRAGMA foreign_keys = ON");
+            }
+        }
+        return connection;
+    }
+
+    /**
+     * 关闭数据库连接
+     */
+    public void close() {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            System.err.println("关闭数据库连接时出错: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 执行更新操作（INSERT/UPDATE/DELETE）
+     * @param sql SQL语句
+     * @param params 参数列表
+     * @return 受影响的行数
+     * @throws SQLException 如果执行出错
+     */
+    public int executeUpdate(String sql, Object... params) throws SQLException {
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            setParameters(pstmt, params);
+            return pstmt.executeUpdate();
+        }
+    }
+
+    /**
+     * 执行查询操作
+     * @param sql SQL查询语句
+     * @param params 参数列表
+     * @return 结果列表（每行一个Map）
+     * @throws SQLException 如果执行出错
+     */
+    public List<Map<String, Object>> executeQuery(String sql, Object... params) throws SQLException {
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            setParameters(pstmt, params);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                
+                while (rs.next()) {
+                    Map<String, Object> row = new HashMap<>();
+                    for (int i = 1; i <= columnCount; i++) {
+                        row.put(metaData.getColumnName(i), rs.getObject(i));
+                    }
+                    resultList.add(row);
+                }
+            }
+        }
+        return resultList;
+    }
+
+    /**
+     * 执行事务
+     * @param operations 要在事务中执行的操作
+     * @return 是否成功
+     */
+    public boolean executeTransaction(SQLTransaction operations) {
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false);
+            
+            // 执行事务操作
+            boolean success = operations.execute(conn);
+            
+            if (success) {
+                conn.commit();
+                return true;
+            } else {
+                conn.rollback();
+                return false;
+            }
+        } catch (SQLException e) {
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException ex) {
+                System.err.println("回滚事务时出错: " + ex.getMessage());
+            }
+            System.err.println("执行事务时出错: " + e.getMessage());
+            return false;
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                }
+            } catch (SQLException e) {
+                System.err.println("重置自动提交时出错: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 批量执行更新操作
+     * @param sql SQL语句
+     * @param batchParams 批量参数列表
+     * @return 每批操作影响的行数
+     * @throws SQLException 如果执行出错
+     */
+    public int[] executeBatchUpdate(String sql, List<Object[]> batchParams) throws SQLException {
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            for (Object[] params : batchParams) {
+                setParameters(pstmt, params);
+                pstmt.addBatch();
+            }
+            return pstmt.executeBatch();
+        }
+    }
+
+    // 设置PreparedStatement参数
+    private void setParameters(PreparedStatement pstmt, Object... params) throws SQLException {
+        if (params != null) {
+            for (int i = 0; i < params.length; i++) {
+                pstmt.setObject(i + 1, params[i]);
+            }
+        }
+    }
+
+    /**
+     * 事务操作接口
+     */
+    @FunctionalInterface
+    public interface SQLTransaction {
+        boolean execute(Connection conn) throws SQLException;
+    }
+}
