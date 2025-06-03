@@ -16,12 +16,12 @@ public class ApplicationMain extends Application {
         //* Load the Login and Main FXML files and set up the scenes */
         FXMLLoader loginLoader = new FXMLLoader(getClass().getResource("login.fxml"));
         Scene loginScene = new Scene(loginLoader.load(), 1400, 800);
-        SceneManager.addScene("login", loginScene);
+        SceneManager.addScene("login", loginScene, loginLoader.getController());
 
         //* Load the Main FXML file and set up the scene */
         FXMLLoader mainLoader = new FXMLLoader(getClass().getResource("main.fxml"));
         Scene mainScene = new Scene(mainLoader.load(), 1400, 800);
-        SceneManager.addScene("main", mainScene);
+        SceneManager.addScene("main", mainScene, mainLoader.getController());
 
         //* Set the initial scene to the login scene */
         SceneManager.switchTo("login");

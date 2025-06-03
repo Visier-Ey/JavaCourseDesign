@@ -33,14 +33,18 @@ public class BorrowRecordDAO {
 
     //* Get borrow records by user */
     public List<Map<String, Object>> getBorrowRecordsByUser(String userId) {
-        try {
-            return dbHelper.executeQuery(
-                "SELECT * FROM borrow_records WHERE user_id = ?", userId);
-        } catch (SQLException e) {
-            System.err.println("Query Borrow Records by User failed: " + e.getMessage());
-            return List.of();
-        }
+    try {
+        String query = "SELECT br.*, u.username, b.title as book_title " +
+                     "FROM borrow_records br " +
+                     "JOIN users u ON br.user_id = u.user_id " +
+                     "JOIN books b ON br.book_id = b.book_id " +
+                     "WHERE br.user_id = ?";
+        return dbHelper.executeQuery(query, userId);
+    } catch (SQLException e) {
+        System.err.println("Query Borrow Records by User failed: " + e.getMessage());
+        return List.of();
     }
+}
     
     //* Add the user borrowRecord */
     public boolean addBorrowRecord(String userId, String bookId, String borrowDate) {
@@ -125,4 +129,32 @@ public class BorrowRecordDAO {
             return false;
         }
     }
+
+    public boolean returnBook(String recordId) {
+        try {
+            boolean success = dbHelper.executeTransaction(conn -> {
+                //* 1.Update the Record Status */
+                try (PreparedStatement pstmt = conn.prepareStatement(
+                    "UPDATE borrow_records SET status = 'RETURNED' WHERE record_id = ?")) {
+                    pstmt.setString(1, recordId);
+                    pstmt.executeUpdate();
+                }
+
+                //* 2.Update the Book Status */
+                try (PreparedStatement pstmt = conn.prepareStatement(
+                    "UPDATE books SET available = TRUE WHERE book_id = (SELECT book_id FROM borrow_records WHERE record_id = ?)")) {
+                    pstmt.setString(1, recordId);
+                    pstmt.executeUpdate();
+                }
+                System.out.println("Book returned successfully for record ID: " + recordId);
+                return true;
+            });
+            return success;
+        } catch (Exception e) {
+            System.err.println("Return Book Failed: " + e.getMessage());
+            return false;
+        }
+    }
+
+
 }

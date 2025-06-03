@@ -33,13 +33,9 @@ public class BorrowRecordService {
     }
 
     public static JSONObject returnBorrowRecord(String recordId) throws Exception {
-        // ? get the data and revise the status of the record,then return the record
-        JSONObject record = getBorrowRecord(recordId);
-        if (record == null) {
-            throw new Exception("Borrow record not found");
-        }
-        record.put("status", "returned");
-        String response = ApiClient.sendRequest("PATCH", "/borrow-records/" + recordId, record.toString());
+        JSONObject record = new JSONObject();
+        record.put("record_id", recordId);
+        String response = ApiClient.sendRequest("PATCH", "/borrow-records/" + recordId + "/return", record.toString());
         return new JSONObject(response);
     }
 

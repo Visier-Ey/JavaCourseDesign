@@ -8,6 +8,8 @@ import javafx.scene.layout.StackPane;
 import java.io.IOException;
 
 import org.visier.coursedesign.Manager.SceneManager;
+import org.visier.coursedesign.Session.UserSession;
+
 import javafx.scene.Node;
 
 import java.net.URL;
@@ -34,6 +36,10 @@ public class MainController {
         booksButton.setOnAction(e -> loadView("booksManagement"));
         usersButton.setOnAction(e -> loadView("userManagement"));
         recordsButton.setOnAction(e -> loadView("borrowRecords"));
+    }
+
+    public void setVisible(){
+        usersButton.setVisible(UserSession.getCurrentUser().getRole().equals("ADMIN"));
     }
 
     private void handleLogout() {

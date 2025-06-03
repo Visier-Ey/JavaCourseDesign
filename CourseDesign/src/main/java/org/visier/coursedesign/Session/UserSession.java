@@ -28,4 +28,5 @@ public class UserSession {
     public static void cleanSession() {
         currentUser = null;
     }
+
 }

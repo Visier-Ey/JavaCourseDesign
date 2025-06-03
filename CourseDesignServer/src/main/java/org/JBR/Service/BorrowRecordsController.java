@@ -9,14 +9,18 @@ import org.JBR.DAO.BorrowRecordDAO;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import static org.JBR.Utils.Utils.createErrorResponse;;
+import static org.JBR.Utils.Utils.createErrorResponse;
+import org.JBR.Utils.JwtUtil;
 
 public class BorrowRecordsController {
     public static void getAllRecords(Context ctx) {
         BorrowRecordDAO borrowRecordDAO = new BorrowRecordDAO("library.db");
+        // TODO: extractUserInfo
+        String userId = JwtUtil.extractUserInfo(ctx.req().getHeader("Authorization")).get("user_id");
+        String role = JwtUtil.extractUserInfo(ctx.req().getHeader("Authorization")).get("role");
         try {
             Map<String, Object> response = new HashMap<>();
-            response.put("book-records", borrowRecordDAO.getAllBorrowRecords());
+            response.put("book-records", role.equals("ADMIN") ? borrowRecordDAO.getAllBorrowRecords() : borrowRecordDAO.getBorrowRecordsByUser(userId));
             response.put("success", true);
             response.put("message", "Borrow records retrieved successfully");
             ctx.json(response);
@@ -55,11 +59,12 @@ public class BorrowRecordsController {
         BorrowRecordDAO borrowRecordDAO = new BorrowRecordDAO("library.db");
         try {
             // Extract data from the request
-            String recordId = ctx.formParam("record_id");
-            String userId = ctx.formParam("user_id");
-            String bookId = ctx.formParam("book_id");
-            String borrowDate = ctx.formParam("borrow_date");
-            String dueDate = ctx.formParam("due_date");
+            JsonNode requestBody = ctx.bodyAsClass(JsonNode.class);
+            String recordId = requestBody.path("record_id").asText();
+            String userId = requestBody.path("user_id").asText();
+            String bookId = requestBody.path("book_id").asText();
+            String borrowDate = requestBody.path("borrow_date").asText();
+            String dueDate = requestBody.path("due_date").asText();
 
             // Call the DAO method to update the record
             boolean success = borrowRecordDAO.updateBorrowRecord(recordId, userId, bookId, borrowDate, dueDate);
@@ -77,9 +82,10 @@ public class BorrowRecordsController {
     public static void deleteRecord(Context ctx) {
         BorrowRecordDAO borrowRecordDAO = new BorrowRecordDAO("library.db");
         try {
-            String recordId = ctx.formParam("record_id");
+            String recordId = ctx.pathParam("id");
             boolean success = borrowRecordDAO.deleteBorrowRecord(recordId);
             if (success) {
+                System.out.println("Borrow record deleted successfully ID:"+ recordId);
                 ctx.status(200).json(Map.of("success", true, "message", "Borrow record deleted successfully"));
             } else {
                 ctx.status(500).json(createErrorResponse("Failed to delete borrow record"));
@@ -93,10 +99,29 @@ public class BorrowRecordsController {
     public static void getUserBorrowRecords(Context ctx) {
         BorrowRecordDAO borrowRecordDAO = new BorrowRecordDAO("library.db");
         try {
-            String userId = ctx.formParam("user_id");
+            JsonNode requestBody = ctx.bodyAsClass(JsonNode.class);
+            String userId = requestBody.path("user_id").asText();
             ctx.json(borrowRecordDAO.getBorrowRecordsByUser(userId));
         } catch (Exception e) {
             ctx.status(500).json(createErrorResponse("Failed to retrieve borrow records for user: " + e.getMessage()));
+        } finally {
+            borrowRecordDAO.close();
+        }
+    }
+
+    public static void returnBook(Context ctx) {
+        BorrowRecordDAO borrowRecordDAO = new BorrowRecordDAO("library.db");
+        try {
+            JsonNode requestBody = ctx.bodyAsClass(JsonNode.class);
+            String recordId = requestBody.path("record_id").asText();
+            boolean success = borrowRecordDAO.returnBook(recordId);
+            if (success) {
+                ctx.status(200).json(Map.of("success", true, "message", "Book returned successfully"));
+            } else {
+                ctx.status(500).json(createErrorResponse("Failed to return book"));
+            }
+        } catch (Exception e) {
+            ctx.status(500).json(createErrorResponse("Failed to return book: " + e.getMessage()));
         } finally {
             borrowRecordDAO.close();
         }

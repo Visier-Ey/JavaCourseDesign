@@ -2,6 +2,7 @@ package org.visier.coursedesign.Controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.visier.coursedesign.Entity.BorrowRecord;
@@ -10,6 +11,10 @@ import org.json.JSONObject;
 import org.visier.coursedesign.Entity.Book;
 import org.visier.coursedesign.Entity.User;
 import org.visier.coursedesign.Service.BorrowRecordService;
+import org.visier.coursedesign.Session.UserSession;
+import org.visier.coursedesign.Utils.Utils;
+
+import java.text.SimpleDateFormat;
 
 import java.util.Date;
 
@@ -55,22 +60,20 @@ public class BorrowRecordsManagementController {
         dueDateColumn.setCellValueFactory(cellData -> cellData.getValue().dueDateProperty());
 
         //* Status column custom display */
-        statusColumn.setCellValueFactory(cellData -> {
-            Date now = new Date();
-            Date dueDate = cellData.getValue().getDueDate();
-            return new SimpleStringProperty(
-                    now.after(dueDate) ? "Overdue" : "Active"
-            );
-        });
+        statusColumn.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
 
         //* Action column for returning books */
         actionColumn.setCellFactory(param -> new TableCell<>() {
             private final Button returnBtn = new Button("Return");
-
+            private final Button deleteBtn = new Button("Delete");
             {
                 returnBtn.setOnAction(event -> {
                     BorrowRecord record = getTableView().getItems().get(getIndex());
                     returnBook(record);
+                });
+                 deleteBtn.setOnAction(event -> {
+                    BorrowRecord record = getTableView().getItems().get(getIndex());
+                    deleteBook(record);
                 });
             }
 
@@ -80,7 +83,11 @@ public class BorrowRecordsManagementController {
                 if (empty) {
                     setGraphic(null);
                 } else {
-                    setGraphic(returnBtn);
+                    returnBtn.setDisable(!getTableView().getItems().get(getIndex()).getStatus().equals("BORROWED"));
+                    deleteBtn.setVisible(UserSession.getCurrentUser().getRole().equals("ADMIN"));
+                    HBox buttonContainer = new HBox(5); 
+                    buttonContainer.getChildren().addAll(returnBtn, deleteBtn);
+                    setGraphic(buttonContainer);
                 }
             }
         });
@@ -116,7 +123,7 @@ public class BorrowRecordsManagementController {
 
                     User user = new User(userId, username, "", "NORMAL", false);
                     Book book = new Book(bookId, bookTitle, "", "", false);
-                    BorrowRecord record = new BorrowRecord(user, book);
+                    BorrowRecord record = new BorrowRecord(user, book, recordId ,status);
 
                     recordList.add(record);
                 }
@@ -167,12 +174,32 @@ public class BorrowRecordsManagementController {
 
     private void returnBook(BorrowRecord record) {
         record.getBook().setAvailable(true);
-        recordList.remove(record);
+        try {
+            JSONObject response = BorrowRecordService.returnBorrowRecord(record.getRecordId());
+            if (response.getBoolean("success")) {
+                record.setStatus("RETURNED");
+                recordsTable.refresh();
+            } else {
+                Utils.showAlert("Error", "Failed to return book: " + response.getString("error"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Utils.showAlert("Error", "Failed to return book: " + e.getMessage());
+        }
+    }
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Book Returned");
-        alert.setHeaderText("Book successfully returned");
-        alert.setContentText(record.getBook().getTitle() + " is now available");
-        alert.showAndWait();
+    private void deleteBook(BorrowRecord record) {
+        try {
+            JSONObject response = BorrowRecordService.deleteBorrowRecord(record.getRecordId());
+            if (response.getBoolean("success")) {
+                recordList.remove(record);
+                recordsTable.refresh();
+            } else {
+                Utils.showAlert("Error", "Failed to delete record: " + response.getString("error"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Utils.showAlert("Error", "Failed to delete record: " + e.getMessage());
+        }
     }
 }

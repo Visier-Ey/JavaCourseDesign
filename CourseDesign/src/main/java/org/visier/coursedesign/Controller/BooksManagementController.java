@@ -11,8 +11,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.visier.coursedesign.Entity.Book;
-import org.visier.coursedesign.Entity.NormalUser;
-import org.visier.coursedesign.Entity.User;
 
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;

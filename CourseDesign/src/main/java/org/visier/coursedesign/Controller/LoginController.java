@@ -11,17 +11,26 @@ import org.visier.coursedesign.Session.UserSession;
 
 public class LoginController {
     // Login components
-    @FXML private TextField usernameField;
-    @FXML private PasswordField passwordField;
-    @FXML private Button loginButton;
-    @FXML private Label errorLabel;
-    
+    @FXML
+    private TextField usernameField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private Button loginButton;
+    @FXML
+    private Label errorLabel;
+
     // Registration components
-    @FXML private TextField regUsernameField;
-    @FXML private PasswordField regPasswordField;
-    @FXML private PasswordField confirmPasswordField;
-    @FXML private Button registerButton;
-    @FXML private Label regErrorLabel;
+    @FXML
+    private TextField regUsernameField;
+    @FXML
+    private PasswordField regPasswordField;
+    @FXML
+    private PasswordField confirmPasswordField;
+    @FXML
+    private Button registerButton;
+    @FXML
+    private Label regErrorLabel;
 
     @FXML
     private void initialize() {
@@ -56,7 +65,11 @@ public class LoginController {
                 User user = new User(response.getString("user_id"), username);
                 user.setRole(response.getString("role"));
                 UserSession.setCurrentUser(user);
-                SceneManager.switchTo("main");
+                SceneManager.switchTo("main", controller -> {
+                    if (controller instanceof MainController) {
+                        ((MainController) controller).setVisible();
+                    }
+                });
             } else {
                 showLoginError(response.getString("error"));
             }

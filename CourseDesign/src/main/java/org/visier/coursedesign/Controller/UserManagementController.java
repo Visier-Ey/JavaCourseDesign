@@ -145,44 +145,52 @@ public class UserManagementController {
     }
 
     private void handleDeleteUser(User user) {
-        showConfirmationDialog("Confirm Deletion", "Delete User",
-                "Are you sure you want to delete user: " + user.getUsername() + "?",
-                () -> userList.remove(user));
+        try {
+            JSONObject response = UserService.deleteUser(user.getUserId());
+            if (response.getBoolean("success")) {
+                userList.remove(user);
+                usersTable.refresh();
+            } else {
+                System.err.println("Failed to delete user: " + response.optString("error", "Unknown error"));
+            }
+        } catch (Exception e) {
+            System.err.println("Error deleting user: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void handlePromoteUser(User user) {
-        showConfirmationDialog("Confirm Promotion", "Promote to Admin",
-                "Promote " + user.getUsername() + " to administrator?",
-                () -> {
-                    int index = userList.indexOf(user);
-                    userList.set(index, new Admin(user.getUserId(), user.getUsername(), user.getPasswordHash(), false));
-                });
+        try {
+            JSONObject response = UserService.promoteUser(user.getUserId());
+            if (response.getBoolean("success")) {
+                User updatedUser = user instanceof NormalUser
+                        ? new Admin(user.getUserId(), user.getUsername(), user.getPasswordHash(), user.isFrozen())
+                        : new NormalUser(user.getUserId(), user.getUsername(), user.getPasswordHash(), user.isFrozen());
+                userList.set(userList.indexOf(user), updatedUser);
+                usersTable.refresh();
+            } else {
+                System.err.println("Failed to promote user: " + response.optString("error", "Unknown error"));
+            }
+        } catch (Exception e) {
+            System.err.println("Error promoting user: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void handleFreezeUser(User user) {
-        if (user instanceof NormalUser) {
-            NormalUser normalUser = (NormalUser) user;
-            String action = normalUser.isFrozen() ? "Unfreeze" : "Freeze";
-
-            showConfirmationDialog("Confirm " + action, action + " User",
-                    action + " user " + user.getUsername() + "?",
-                    () -> {
-                        if (normalUser.isFrozen()) {
-                            // Call admin's unfreeze method if current user is admin
-                            if (currentUser instanceof Admin) {
-                                ((Admin) currentUser).unfreezeUser(normalUser);
-                            }
-                            normalUser.setFrozen(false);
-                        } else {
-                            // Call admin's freeze method if current user is admin
-                            if (currentUser instanceof Admin) {
-                                ((Admin) currentUser).freezeUser(normalUser);
-                            }
-                            normalUser.setFrozen(true);
-                        }
-                        usersTable.refresh();
-                    });
+        try {
+            JSONObject response = user.isFrozen() ? UserService.unfreezeUser(user.getUserId()) : UserService.freezeUser(user.getUserId());
+            if (response.getBoolean("success")) {
+                userList.set(userList.indexOf(user), new NormalUser(user.getUserId(), user.getUsername(), user.getPasswordHash(), !user.isFrozen()));
+                usersTable.refresh();
+            } else {
+                System.err.println("Failed to change user status: " + response.optString("error", "Unknown error"));
+            }
+        } catch (Exception e) {
+            System.err.println("Error changing user status: " + e.getMessage());
+            e.printStackTrace();
         }
+        
     }
 
     private void showConfirmationDialog(String title, String header, String content, Runnable action) {

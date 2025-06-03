@@ -8,7 +8,7 @@ import org.JBR.Utils.JwtUtil;
 
 public class JavalinServer {
     public static void run() {
-        //! Javalin Server Initialization
+        // ! Javalin Server Initialization
         Javalin app = Javalin.create(
                 config -> {
                     config.router.apiBuilder(
@@ -21,6 +21,15 @@ public class JavalinServer {
                                         get(UserController::getUser);
                                         patch(UserController::updateUser);
                                         delete(UserController::deleteUser);
+                                        path("freeze", () -> {
+                                            patch(UserController::freezeUser);
+                                        });
+                                        path("unfreeze", () -> {
+                                            patch(UserController::unfreezeUser);
+                                        });
+                                        path("/promote", () -> {
+                                            patch(UserController::promoteUser);
+                                        });
                                     });
                                     ws("/events", UserController::webSocketEvents);
                                     path("/login", () -> {
@@ -48,12 +57,15 @@ public class JavalinServer {
                                         get(BorrowRecordsController::getRecord);
                                         patch(BorrowRecordsController::updateRecord);
                                         delete(BorrowRecordsController::deleteRecord);
+                                        path("/return", () -> {
+                                            patch(BorrowRecordsController::returnBook);
+                                        });
                                     });
                                 });
                             });
                 }).start(8080);
 
-        //! JWT Verification
+        // ! JWT Verification
         app.before(ctx -> {
             if (!ctx.path().equals("/users/login") && !ctx.path().equals("/users/register")) {
                 String token = ctx.header("Authorization");
@@ -61,7 +73,7 @@ public class JavalinServer {
                     ctx.status(401).json("Missing or invalid token");
                     return;
                 }
-                token = token.substring(7); //* */ Remove "Bearer " prefix
+                token = token.substring(7); // * */ Remove "Bearer " prefix
                 // TODO: Implement JWT validation logic
                 if (!JwtUtil.validateToken(token)) {
                     ctx.status(401).json("Invalid or expired token");

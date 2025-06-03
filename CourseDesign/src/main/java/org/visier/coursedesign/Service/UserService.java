@@ -44,4 +44,17 @@ public final class UserService {
         String response = ApiClient.sendRequest("DELETE", "/users/" + userId, "");
         return new JSONObject(response);
     }
+
+    public static JSONObject freezeUser(String userId) throws Exception {
+        String response = ApiClient.sendRequest("PATCH", "/users/" + userId + "/freeze", "");
+        return new JSONObject(response);
+    }
+    public static JSONObject unfreezeUser(String userId) throws Exception {
+        String response = ApiClient.sendRequest("PATCH", "/users/" + userId + "/unfreeze", "");
+        return new JSONObject(response);
+    }
+    public static JSONObject promoteUser(String userId) throws Exception {
+        String response = ApiClient.sendRequest("PATCH", "/users/" + userId + "/promote", "");
+        return new JSONObject(response);
+    }
 }

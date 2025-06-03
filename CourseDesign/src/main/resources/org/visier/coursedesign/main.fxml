@@ -18,8 +18,8 @@
         <VBox style="-fx-background-color: #f4f4f4; -fx-padding: 10; -fx-spacing: 10;" prefWidth="200">
             <Button text="Dashboard" fx:id="dashboardButton" style="-fx-pref-width: 180px;"/>
             <Button text="Books Management" fx:id="booksButton" style="-fx-pref-width: 180px;"/>
+            <Button text="Borrow Records Management" fx:id="recordsButton" style="-fx-pref-width: 180px;"/>
             <Button text="User Management" fx:id="usersButton" style="-fx-pref-width: 180px;"/>
-            <Button text="Borrow Records" fx:id="recordsButton" style="-fx-pref-width: 180px;"/>
         </VBox>
     </left>
 

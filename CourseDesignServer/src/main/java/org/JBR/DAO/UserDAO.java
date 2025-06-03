@@ -155,4 +155,48 @@ public class UserDAO {
             return false;
         }
     }
+
+    /**
+     * Freeze user account
+     * @return true if successful
+     */
+    public boolean freezeUser(String userId) {
+        try {
+            int affected = dbHelper.executeUpdate(
+                "UPDATE users SET frozen = 1 WHERE user_id = ?", userId);
+            return affected > 0;
+        } catch (SQLException e) {
+            System.err.println("Freeze user failed: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Unfreeze user account
+     * @return true if successful
+     */
+    public boolean unfreezeUser(String userId) {
+        try {
+            int affected = dbHelper.executeUpdate(
+                "UPDATE users SET frozen = 0 WHERE user_id = ?", userId);
+            return affected > 0;
+        } catch (SQLException e) {
+            System.err.println("Unfreeze user failed: " + e.getMessage());
+            return false;
+        }
+    }
+    /**
+     * Promote user to admin role
+     * @return true if successful
+     */
+    public boolean promoteUser(String userId) {
+        try {
+            int affected = dbHelper.executeUpdate(
+                "UPDATE users SET role = 'ADMIN' WHERE user_id = ?", userId);
+            return affected > 0;
+        } catch (SQLException e) {
+            System.err.println("Promote to admin failed: " + e.getMessage());
+            return false;
+        }
+    }
 }

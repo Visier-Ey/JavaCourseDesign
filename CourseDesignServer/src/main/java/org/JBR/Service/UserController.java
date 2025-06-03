@@ -110,7 +110,7 @@ public class UserController {
 
             // 生成JWT令牌
             Map<String, Object> response = new HashMap<>();
-            String token = JwtUtil.generateToken(username);
+            String token = JwtUtil.generateToken(user.get("user_id").toString(), user.get("role").toString());
             response.put("success", true);
             response.put("token", token);
             response.put("role", user.get("role")); 
@@ -132,7 +132,7 @@ public class UserController {
             JsonNode requestBody = objectMapper.readTree(ctx.body());
             String username = requestBody.path("username").asText();
             String password = requestBody.path("password").asText();
-            String role = "Normal"; // 默认角色
+            String role = "NORMAL";
 
             if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
                 ctx.status(400).json(createErrorResponse("Username and password are required"));
@@ -166,5 +166,70 @@ public class UserController {
         }
     }
 
+    public static void freezeUser(Context ctx) {
+        UserDAO userDAO = new UserDAO(DB_PATH);
+        try {
+            String userId = ctx.pathParam("id");
+            if (userId == null || userId.isEmpty()) {
+                ctx.status(400).json(createErrorResponse("User ID is required"));
+                return;
+            }
+
+            boolean success = userDAO.freezeUser(userId);
+            if (success) {
+                ctx.status(200).json(Map.of("success", true, "message", "User frozen successfully"));
+            } else {
+                ctx.status(404).json(createErrorResponse("User not found"));
+            }
+        } catch (Exception e) {
+            ctx.status(500).json(createErrorResponse("Failed to freeze user: " + e.getMessage()));
+        } finally {
+            userDAO.close();
+        }
+    }
+
+    public static void unfreezeUser(Context ctx) {
+        UserDAO userDAO = new UserDAO(DB_PATH);
+        try {
+            String userId = ctx.pathParam("id");
+            if (userId == null || userId.isEmpty()) {
+                ctx.status(400).json(createErrorResponse("User ID is required"));
+                return;
+            }
+
+            boolean success = userDAO.unfreezeUser(userId);
+            if (success) {
+                ctx.status(200).json(Map.of("success", true, "message", "User unfrozen successfully"));
+            } else {
+                ctx.status(404).json(createErrorResponse("User not found"));
+            }
+        } catch (Exception e) {
+            ctx.status(500).json(createErrorResponse("Failed to unfreeze user: " + e.getMessage()));
+        } finally {
+            userDAO.close();
+        }
+    }
+
+    public static void promoteUser(Context ctx) {
+        UserDAO userDAO = new UserDAO(DB_PATH);
+        try {
+            String userId = ctx.pathParam("id");
+            if (userId == null || userId.isEmpty()) {
+                ctx.status(400).json(createErrorResponse("User ID is required"));
+                return;
+            }
+
+            boolean success = userDAO.promoteUser(userId);
+            if (success) {
+                ctx.status(200).json(Map.of("success", true, "message", "User promoted successfully"));
+            } else {
+                ctx.status(404).json(createErrorResponse("User not found"));
+            }
+        } catch (Exception e) {
+            ctx.status(500).json(createErrorResponse("Failed to promote user: " + e.getMessage()));
+        } finally {
+            userDAO.close();
+        }
+    }
 
 }

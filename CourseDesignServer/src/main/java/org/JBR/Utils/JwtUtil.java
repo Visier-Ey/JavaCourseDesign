@@ -5,9 +5,10 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
 
-import org.eclipse.jetty.http.HttpTester.Response;
-
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import io.jsonwebtoken.Claims;
 
 public class JwtUtil {
     
@@ -16,9 +17,10 @@ public class JwtUtil {
 
     private static final long EXPIRATION_TIME = 86400000; //* 24 hours in milliseconds
 
-    public static String generateToken(String username) {
+    public static String generateToken(String user_id, String role) {
         return Jwts.builder()
-                .subject(username)
+                .subject(user_id)
+                .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SECRET_KEY, Jwts.SIG.HS256)  //* Use SecretKey
@@ -36,13 +38,19 @@ public class JwtUtil {
             return false;
         }
     }
-
-    public static String getUsernameFromToken(String token) {
-        return Jwts.parser()
+    
+    public static Map<String, String> extractUserInfo(String BearerToken) {
+        String cleanedToken = BearerToken.replaceFirst("^Bearer\\s+", "");
+        Claims claims = Jwts.parser()
                 .verifyWith(SECRET_KEY)
                 .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+                .parseSignedClaims(cleanedToken)
+                .getPayload();
+        
+        Map<String, String> userInfo = new HashMap<>();
+        userInfo.put("user_id", claims.getSubject());
+        userInfo.put("role", claims.get("role", String.class));
+        
+        return userInfo;
     }
 }
