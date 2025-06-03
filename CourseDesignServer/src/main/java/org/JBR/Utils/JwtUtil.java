@@ -3,11 +3,13 @@ package org.JBR.Utils;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import javax.crypto.SecretKey; 
+import javax.crypto.SecretKey;
+
+import org.eclipse.jetty.http.HttpTester.Response;
+
 import java.util.Date;
 
 public class JwtUtil {
-    
     
     private static final String SECRET_STRING = "mySecretKeyMustBeAtLeast32BytesLong123456";
     private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET_STRING.getBytes());

@@ -20,7 +20,11 @@ public class BorrowRecordDAO {
     //* Get all borrow records */
     public List<Map<String, Object>> getAllBorrowRecords() {
         try {
-            return dbHelper.executeQuery("SELECT * FROM borrow_records");
+            String query = "SELECT br.*, u.username, b.title as book_title " +
+                        "FROM borrow_records br " +
+                        "JOIN users u ON br.user_id = u.user_id " +
+                        "JOIN books b ON br.book_id = b.book_id";
+            return dbHelper.executeQuery(query);
         } catch (SQLException e) {
             System.err.println("Query All the Records failed: " + e.getMessage());
             return List.of();
@@ -39,19 +43,20 @@ public class BorrowRecordDAO {
     }
     
     //* Add the user borrowRecord */
-    public boolean addBorrowRecord(String recordId, String userId, String bookId, String borrowDate, String dueDate) {
+    public boolean addBorrowRecord(String userId, String bookId, String borrowDate) {
         try {
             //* Add the user borrowRecord */
             boolean success = dbHelper.executeTransaction(conn -> {
                 //* 1.Insert the Record */
                 try (PreparedStatement pstmt = conn.prepareStatement(
                     "INSERT INTO borrow_records (record_id, user_id, book_id, borrow_date, due_date, status) " +
-                    "VALUES (?, ?, ?, ?, ?, 'BORROWED')")) {
-                    pstmt.setString(1, recordId);
+                    "VALUES (?, ?, ?, ?, ?, ?)")) {
+                    pstmt.setString(1, "R" + System.currentTimeMillis()); // Generate a unique record ID
                     pstmt.setString(2, userId);
                     pstmt.setString(3, bookId);
                     pstmt.setString(4, borrowDate);
-                    pstmt.setString(5, dueDate);
+                    pstmt.setString(5, SQLiteHelper.calculateDueDate(borrowDate)); // Assuming this method exists
+                    pstmt.setString(6, "BORROWED");
                     pstmt.executeUpdate();
                 }
 
@@ -68,6 +73,7 @@ public class BorrowRecordDAO {
             
         } catch (Exception e) {
             System.err.println("Add Records Failed: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }

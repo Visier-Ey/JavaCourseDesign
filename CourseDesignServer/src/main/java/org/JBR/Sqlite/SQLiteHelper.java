@@ -1,10 +1,20 @@
 package org.JBR.Sqlite;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 /**
  * SQLite 数据库操作封装类
@@ -123,9 +133,9 @@ public class SQLiteHelper {
                     conn.rollback();
                 }
             } catch (SQLException ex) {
-                System.err.println("回滚事务时出错: " + ex.getMessage());
+                System.err.println("Rollback error: " + ex.getMessage());
             }
-            System.err.println("执行事务时出错: " + e.getMessage());
+            System.err.println("Transaction execution error: " + e.getMessage());
             return false;
         } finally {
             try {
@@ -133,7 +143,7 @@ public class SQLiteHelper {
                     conn.setAutoCommit(true);
                 }
             } catch (SQLException e) {
-                System.err.println("重置自动提交时出错: " + e.getMessage());
+                System.err.println("Reset auto-commit error: " + e.getMessage());
             }
         }
     }
@@ -163,6 +173,20 @@ public class SQLiteHelper {
             for (int i = 0; i < params.length; i++) {
                 pstmt.setObject(i + 1, params[i]);
             }
+        }
+    }
+
+    public static String calculateDueDate(String borrowDate) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = sdf.parse(borrowDate);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.DAY_OF_MONTH, 30); //* Assuming 30 days borrowing period */
+            return sdf.format(calendar.getTime());
+        } catch (ParseException e) {
+            System.err.println("Error parsing date: " + e.getMessage());
+            return null;
         }
     }
 

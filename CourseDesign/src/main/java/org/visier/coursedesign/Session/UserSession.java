@@ -4,7 +4,7 @@ import org.visier.coursedesign.Entity.User;
 
 public class UserSession {
     private static UserSession instance;
-    private User currentUser;
+    private static User currentUser;
 
     private UserSession() {
     }
@@ -17,15 +17,15 @@ public class UserSession {
     }
 
     // getter/setter
-    public void setCurrentUser(User user) {
-        this.currentUser = user;
+    public static void setCurrentUser(User user) {
+        currentUser = user;
     }
 
-    public User getCurrentUser() {
+    public static User getCurrentUser() {
         return currentUser;
     }
 
-    public void cleanSession() {
+    public static void cleanSession() {
         currentUser = null;
     }
 }

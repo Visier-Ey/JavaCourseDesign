@@ -33,6 +33,7 @@
             <TableColumn text="Author" fx:id="authorColumn" prefWidth="150"/>
             <TableColumn text="ISBN" fx:id="isbnColumn" prefWidth="150"/>
             <TableColumn text="Available" fx:id="availableColumn" prefWidth="80"/>
+            <TableColumn text="Actions" fx:id="actionsColumn" prefWidth="250"/>
         </columns>
     </TableView>
 </VBox>

@@ -8,6 +8,7 @@ import io.javalin.http.Context;
 import io.javalin.websocket.WsConfig;
 import java.util.HashMap;
 import java.util.Map;
+import static org.JBR.Utils.Utils.createErrorResponse;;
 
 public class UserController {
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -112,8 +113,8 @@ public class UserController {
             String token = JwtUtil.generateToken(username);
             response.put("success", true);
             response.put("token", token);
-            response.put("username", username);
             response.put("role", user.get("role")); 
+            response.put("user_id", user.get("user_id")); // 返回用户ID
             response.put("message", "Login successful");
 
             ctx.json(response);
@@ -124,7 +125,7 @@ public class UserController {
             userDAO.close();
         }
     }
-    // 注册新用户
+
     public static void register(Context ctx) {
         UserDAO userDAO = new UserDAO(DB_PATH);
         try {
@@ -165,10 +166,5 @@ public class UserController {
         }
     }
 
-    private static Map<String, Object> createErrorResponse(String message) {
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("error", message);
-        errorResponse.put("success", false);
-        return errorResponse;
-    }
+
 }

@@ -4,8 +4,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.json.JSONObject;
 import org.visier.coursedesign.ApiClient.ApiClient;
+import org.visier.coursedesign.Entity.User;
 import org.visier.coursedesign.Manager.SceneManager;
 import org.visier.coursedesign.Service.UserService;
+import org.visier.coursedesign.Session.UserSession;
 
 public class LoginController {
     // Login components
@@ -51,6 +53,9 @@ public class LoginController {
             JSONObject response = UserService.login(username, password);
             if (response.getBoolean("success")) {
                 ApiClient.setToken(response.getString("token"));
+                User user = new User(response.getString("user_id"), username);
+                user.setRole(response.getString("role"));
+                UserSession.setCurrentUser(user);
                 SceneManager.switchTo("main");
             } else {
                 showLoginError(response.getString("error"));

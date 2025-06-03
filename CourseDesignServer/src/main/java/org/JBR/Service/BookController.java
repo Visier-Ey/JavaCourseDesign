@@ -5,6 +5,7 @@ import org.JBR.DAO.BookDAO;
 
 import java.util.HashMap;
 import java.util.Map;
+import static org.JBR.Utils.Utils.createErrorResponse;;
 
 
 public class BookController {
@@ -16,7 +17,7 @@ public class BookController {
             response.put("success", true);
             ctx.json(response);
         } catch (Exception e) {
-            ctx.status(500).json(Map.of("success", false, "message", "Failed to retrieve books: " + e.getMessage()));
+            ctx.status(500).json(createErrorResponse("Failed to retrieve books: " + e.getMessage()));
         } finally {
             bookDAO.close();
         }
@@ -43,7 +44,7 @@ public class BookController {
             String isbn = ctx.formParam("isbn");
 
             if (bookId == null || title == null || author == null || isbn == null) {
-                ctx.status(400).json(Map.of("success", false, "message", "All fields are required"));
+                ctx.status(400).json(createErrorResponse("All fields are required"));
                 return;
             }
 
@@ -51,10 +52,10 @@ public class BookController {
             if (success) {
                 ctx.status(201).json(Map.of("success", true, "message", "Book created successfully"));
             } else {
-                ctx.status(500).json(Map.of("success", false, "message", "Failed to create book"));
+                ctx.status(500).json(createErrorResponse("Failed to create book"));
             }
         } catch (Exception e) {
-            ctx.status(500).json(Map.of("success", false, "message", "Failed to create book: " + e.getMessage()));
+            ctx.status(500).json(createErrorResponse("Failed to create book: " + e.getMessage()));
         } finally {
             bookDAO.close();
         }
@@ -65,7 +66,7 @@ public class BookController {
         try {
             String bookId = ctx.pathParam("id");
             if (bookId == null || bookId.isEmpty()) {
-                ctx.status(400).json(Map.of("success", false, "message", "Book ID is required"));
+                ctx.status(400).json(createErrorResponse("Book ID is required"));
                 return;
             }
 
@@ -74,7 +75,7 @@ public class BookController {
             String isbn = ctx.formParam("isbn");
 
             if (title == null || author == null || isbn == null) {
-                ctx.status(400).json(Map.of("success", false, "message", "All fields are required"));
+                ctx.status(400).json(createErrorResponse("All fields are required"));
                 return;
             }
 
@@ -82,10 +83,10 @@ public class BookController {
             if (success) {
                 ctx.status(200).json(Map.of("success", true, "message", "Book updated successfully"));
             } else {
-                ctx.status(404).json(Map.of("success", false, "message", "Book not found"));
+                ctx.status(404).json(createErrorResponse("Book not found"));
             }
         } catch (Exception e) {
-            ctx.status(500).json(Map.of("success", false, "message", "Failed to update book: " + e.getMessage()));
+            ctx.status(500).json(createErrorResponse("Failed to update book: " + e.getMessage()));
         } finally {
             bookDAO.close();
         }

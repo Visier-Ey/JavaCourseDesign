@@ -5,8 +5,11 @@ import javafx.scene.control.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.visier.coursedesign.Entity.BorrowRecord;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.visier.coursedesign.Entity.Book;
 import org.visier.coursedesign.Entity.User;
+import org.visier.coursedesign.Service.BorrowRecordService;
 
 import java.util.Date;
 
@@ -83,7 +86,7 @@ public class BorrowRecordsManagementController {
         });
 
         //? Load sample data
-        loadSampleData();
+        getAllBorrowRecords();
 
         //! binding the data to the table
         recordsTable.setItems(recordList);
@@ -95,16 +98,32 @@ public class BorrowRecordsManagementController {
         returnButton.setOnAction(e -> returnSelectedBook());
     }
 
-    private void loadSampleData() {
+    private void getAllBorrowRecords() {
         //* Sample data for demonstration purposes */
-        User user1 = new User("U001", "Alice", "hash1", "NORMAL", false);
-        User user2 = new User("U002", "Bob", "hash2", "NORMAL", false);
+        try {
+            JSONObject response = BorrowRecordService.getAllBorrowRecords();
+             if (response.getBoolean("success")) {
+                JSONArray recordsArray = response.getJSONArray("book-records");
+                for (int i = 0; i < recordsArray.length(); i++) {
+                    String recordId = recordsArray.getJSONObject(i).getString("record_id");
+                    String userId = recordsArray.getJSONObject(i).getString("user_id");
+                    String bookId = recordsArray.getJSONObject(i).getString("book_id");
+                    String borrowDate = recordsArray.getJSONObject(i).getString("borrow_date");
+                    String dueDate = recordsArray.getJSONObject(i).getString("due_date");
+                    String status = recordsArray.getJSONObject(i).getString("status");
+                     String bookTitle = recordsArray.getJSONObject(i).getString("book_title");
+                    String username = recordsArray.getJSONObject(i).getString("username");
 
-        Book book1 = new Book("B001", "Java Programming", "John Doe", "123456789", true);
-        Book book2 = new Book("B002", "Advanced Java", "Jane Smith", "987654321", true);
+                    User user = new User(userId, username, "", "NORMAL", false);
+                    Book book = new Book(bookId, bookTitle, "", "", false);
+                    BorrowRecord record = new BorrowRecord(user, book);
 
-        recordList.add(new BorrowRecord(user1, book1));
-        recordList.add(new BorrowRecord(user2, book2));
+                    recordList.add(record);
+                }
+             }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void searchRecords() {
