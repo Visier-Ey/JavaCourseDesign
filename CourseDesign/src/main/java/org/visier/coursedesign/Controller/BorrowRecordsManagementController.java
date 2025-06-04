@@ -14,11 +14,8 @@ import org.visier.coursedesign.Service.BorrowRecordService;
 import org.visier.coursedesign.Session.UserSession;
 import org.visier.coursedesign.Utils.Utils;
 
-import java.text.SimpleDateFormat;
-
 import java.util.Date;
 
-import javafx.beans.property.SimpleStringProperty;
 
 public class BorrowRecordsManagementController {
     @FXML
