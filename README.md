@@ -49,6 +49,11 @@ E:.
 │  └─target
 │      └─classes
 └─SystemDesign
+    ├─DB
+    ├─Entity
+    ├─Relationship
+    ├─Structure
+    └─Workflow
 ```
 可以看到这里前后端都有Service包,这里好像前端是不该有的,而且后端作者忘记添加DAO的包,
 后面实在懒得加上去了,这些都是很不规范的写法
