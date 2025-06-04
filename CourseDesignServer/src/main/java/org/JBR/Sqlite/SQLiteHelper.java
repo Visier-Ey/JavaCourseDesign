@@ -56,7 +56,7 @@ public class SQLiteHelper {
                 connection.close();
             }
         } catch (SQLException e) {
-            System.err.println("关闭数据库连接时出错: " + e.getMessage());
+            System.err.println("Error when close: " + e.getMessage());
         }
     }
 

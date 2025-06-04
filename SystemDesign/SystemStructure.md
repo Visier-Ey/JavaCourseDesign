@@ -1,7 +1,12 @@
 ```mermaid
 flowchart TD
-    A[JavaFX Client] -->|Socket| B[Server]
-    B --> C[Thread Pool]
-    C --> D[Request Handler]
-    D --> E[Database]
-    D --> F[Recommendation Engine]
+    A[Client] -->|HTTP| B[JavalinServer]
+    B --> C[BookService]
+    B --> D[UserService]
+    B --> E[BorrowRecordService]
+    C --> F[BookDAO]
+    D --> G[UserDAO]
+    E --> H[BorrowRecordDAO]
+    F --> I[SQLite]
+    G --> I
+    H --> I

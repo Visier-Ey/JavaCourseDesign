@@ -1,15 +1,13 @@
 ```mermaid
 sequenceDiagram
     participant Client
-    participant Server
+    participant JavalinServer
+    participant UserService
     participant Database
     
-    Client->>Server: Login Request (username, password)
-    Server->>Database: Verify Credentials
-    alt Valid Credentials
-        Database-->>Server: User Data
-        Server-->>Client: Success + User Role
-    else Invalid Credentials
-        Database-->>Server: Error
-        Server-->>Client: Failure Message
-    end
+    Client->>JavalinServer: POST /login
+    JavalinServer->>UserService: authenticate()
+    UserService->>Database: SELECT user
+    Database-->>UserService: user data
+    UserService-->>JavalinServer: JWT token
+    JavalinServer-->>Client: return token

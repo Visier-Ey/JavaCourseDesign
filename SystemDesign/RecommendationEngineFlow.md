@@ -1,8 +1,9 @@
 ```mermaid
 graph LR
-    A[User History] --> B[Content Filtering]
-    A --> C[Collaborative Filtering]
-    B --> D[Keyword Analysis]
-    C --> E[Similar Users]
-    D --> F[Recommendations]
-    E --> F
+    A[Input User ID] --> B{Has Borrow History?}
+    B -->|Yes| C[Collaborative Filtering]
+    B -->|No| D[Content-Based Filtering]
+    C --> E[Recommend Similar Users' Books]
+    D --> F[Recommend Popular Books]
+    E --> G[Output Recommendations]
+    F --> G

@@ -15,50 +15,53 @@ public class JavalinServer {
                             () -> {
                                 // ! User Management Routes
                                 path("/users", () -> {
-                                    get(UserController::getAllUsers);
-                                    post(UserController::createUser);
+                                    get(UserService::getAllUsers);
+                                    post(UserService::createUser);
                                     path("/{id}", () -> {
-                                        get(UserController::getUser);
-                                        patch(UserController::updateUser);
-                                        delete(UserController::deleteUser);
+                                        get(UserService::getUser);
+                                        patch(UserService::updateUser);
+                                        delete(UserService::deleteUser);
                                         path("freeze", () -> {
-                                            patch(UserController::freezeUser);
+                                            patch(UserService::freezeUser);
                                         });
                                         path("unfreeze", () -> {
-                                            patch(UserController::unfreezeUser);
+                                            patch(UserService::unfreezeUser);
                                         });
                                         path("/promote", () -> {
-                                            patch(UserController::promoteUser);
+                                            patch(UserService::promoteUser);
                                         });
                                     });
-                                    ws("/events", UserController::webSocketEvents);
+                                    ws("/events", UserService::webSocketEvents);
                                     path("/login", () -> {
-                                        post(UserController::login);
+                                        post(UserService::login);
                                     });
                                     path("/register", () -> {
-                                        post(UserController::register);
+                                        post(UserService::register);
                                     });
                                 });
                                 // ! Book Management Routes
                                 path("/books", () -> {
-                                    get(BookController::getAllBooks);
-                                    post(BookController::createBook);
+                                    get(BookService::getAllBooks);
+                                    post(BookService::createBook);
                                     path("/{id}", () -> {
-                                        get(BookController::getBook);
-                                        patch(BookController::updateBook);
-                                        delete(BookController::deleteBook);
+                                        get(BookService::getBook);
+                                        patch(BookService::updateBook);
+                                        delete(BookService::deleteBook);
                                     });
                                 });
                                 // ! Borrow Records Management Routes
                                 path("/borrow-records", () -> {
-                                    get(BorrowRecordsController::getAllRecords);
-                                    post(BorrowRecordsController::createRecord);
+                                    get(BorrowRecordsService::getAllRecords);
+                                    post(BorrowRecordsService::createRecord);
+                                    path("/statistics", () -> {
+                                            get(BorrowRecordsService::getStatistics);
+                                        });
                                     path("/{id}", () -> {
-                                        get(BorrowRecordsController::getRecord);
-                                        patch(BorrowRecordsController::updateRecord);
-                                        delete(BorrowRecordsController::deleteRecord);
+                                        get(BorrowRecordsService::getRecord);
+                                        patch(BorrowRecordsService::updateRecord);
+                                        delete(BorrowRecordsService::deleteRecord);
                                         path("/return", () -> {
-                                            patch(BorrowRecordsController::returnBook);
+                                            patch(BorrowRecordsService::returnBook);
                                         });
                                     });
                                 });

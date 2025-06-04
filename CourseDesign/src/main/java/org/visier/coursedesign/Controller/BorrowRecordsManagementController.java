@@ -98,6 +98,11 @@ public class BorrowRecordsManagementController {
         //! binding the data to the table
         recordsTable.setItems(recordList);
 
+        
+        recordsTable.getSortOrder().add(statusColumn); // Secondary sort by status
+        recordsTable.getSortOrder().add(borrowDateColumn); // Primary sort by borrow date
+        recordsTable.sort();
+
         //* Set up search and action buttons */
         searchButton.setOnAction(e -> searchRecords());
         addButton.setOnAction(e -> showAddRecordDialog());
@@ -180,11 +185,11 @@ public class BorrowRecordsManagementController {
                 record.setStatus("RETURNED");
                 recordsTable.refresh();
             } else {
-                Utils.showAlert("Error", "Failed to return book: " + response.getString("error"));
+                Utils.showErrorAlert("Error", "Failed to return book: " + response.getString("error"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Utils.showAlert("Error", "Failed to return book: " + e.getMessage());
+            Utils.showErrorAlert("Error", "Failed to return book: " + e.getMessage());
         }
     }
 
@@ -195,11 +200,11 @@ public class BorrowRecordsManagementController {
                 recordList.remove(record);
                 recordsTable.refresh();
             } else {
-                Utils.showAlert("Error", "Failed to delete record: " + response.getString("error"));
+                Utils.showErrorAlert("Error", "Failed to delete record: " + response.getString("error"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Utils.showAlert("Error", "Failed to delete record: " + e.getMessage());
+            Utils.showErrorAlert("Error", "Failed to delete record: " + e.getMessage());
         }
     }
 }

@@ -3,12 +3,14 @@ package org.JBR.Service;
 import io.javalin.http.Context;
 import org.JBR.DAO.BookDAO;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.util.HashMap;
 import java.util.Map;
 import static org.JBR.Utils.Utils.createErrorResponse;;
 
 
-public class BookController {
+public class BookService {
     public static void getAllBooks(Context ctx) {
         BookDAO bookDAO = new BookDAO("library.db");
         try {
@@ -38,10 +40,11 @@ public class BookController {
     public static void createBook(Context ctx) {
        BookDAO bookDAO = new BookDAO("library.db");
         try {
-            String bookId = ctx.formParam("bookId");
-            String title = ctx.formParam("title");
-            String author = ctx.formParam("author");
-            String isbn = ctx.formParam("isbn");
+            JsonNode requestBody = ctx.bodyAsClass(JsonNode.class);
+            String bookId = requestBody.path("book_id").asText();
+            String title = requestBody.path("title").asText();
+            String author = requestBody.path("author").asText();
+            String isbn = requestBody.path("isbn").asText();
 
             if (bookId == null || title == null || author == null || isbn == null) {
                 ctx.status(400).json(createErrorResponse("All fields are required"));
@@ -93,24 +96,24 @@ public class BookController {
     }
 
     public static void deleteBook(Context ctx) {
-    //     BookDAO bookDAO = new BookDAO("library.db");
-    //     try {
-    //         String bookId = ctx.pathParam("id");
-    //         if (bookId == null || bookId.isEmpty()) {
-    //             ctx.status(400).json(Map.of("success", false, "message", "Book ID is required"));
-    //             return;
-    //         }
+        BookDAO bookDAO = new BookDAO("library.db");
+        try {
+            String bookId = ctx.pathParam("id");
+            if (bookId == null || bookId.isEmpty()) {
+                ctx.status(400).json(createErrorResponse("Book ID is required"));
+                return;
+            }
 
-    //         boolean success = bookDAO.deleteBook(bookId);
-    //         if (success) {
-    //             ctx.status(200).json(Map.of("success", true, "message", "Book deleted successfully"));
-    //         } else {
-    //             ctx.status(404).json(Map.of("success", false, "message", "Book not found"));
-    //         }
-    //     } catch (Exception e) {
-    //         ctx.status(500).json(Map.of("success", false, "message", "Failed to delete book: " + e.getMessage()));
-    //     } finally {
-    //         bookDAO.close();
-    //     }
+            boolean success = bookDAO.deleteBook(bookId);
+            if (success) {
+                ctx.status(200).json(Map.of("success", true, "message", "Book deleted successfully"));
+            } else {
+                ctx.status(404).json(createErrorResponse("Failed to delete book: Book not found or has active borrow records"));
+            }
+        } catch (Exception e) {
+            ctx.status(500).json(createErrorResponse("Failed to delete book: " + e.getMessage()));
+        } finally {
+            bookDAO.close();
+        }
     }
 }

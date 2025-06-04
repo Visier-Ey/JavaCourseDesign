@@ -1,10 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.visier.coursedesign.Controller.DashboardController"
-      spacing="10" alignment="CENTER">
-    <Label text="Dashboard Overview" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-    <Button text="View Statistics" fx:id="statsButton"/>
+      spacing="20" alignment="TOP_CENTER" style="-fx-padding: 20;">
+
+    <Label text="Library Management System Dashboard" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+    <Button text="View Statistics" fx:id="statsButton" 
+            style="-fx-font-size: 14px; -fx-pref-width: 200;"/>
+
+    <!-- Chart Container - Holds the statistical charts -->
+    <HBox fx:id="chartContainer" visible="false" spacing="40" alignment="CENTER" 
+          style="-fx-padding: 20; -fx-background-color: #f5f5f5;">
+
+        <!-- Bar Chart - Increase size and remove legend -->
+        <BarChart fx:id="barChart" title="Book Borrowing Statistics" 
+                 minWidth="500" minHeight="400" prefWidth="500" prefHeight="400"
+                 legendVisible="false" animated="false"
+                 style="
+                    -fx-bar-gap: 5px;
+                    -fx-category-gap: 30px;
+                    -fx-font-family: 'Microsoft YaHei';
+                    -fx-font-size: 12px;">
+            <xAxis>
+                <CategoryAxis label="Book Title" />
+            </xAxis>
+            <yAxis>
+                <NumberAxis label="Borrow Count" />
+            </yAxis>
+        </BarChart>
+
+        <!-- Pie Chart - Increase size and add legend -->
+        <PieChart fx:id="pieChart" title="The Popularity of Books" 
+                  minWidth="100" minHeight="150" 
+                  legendVisible="true"  style="
+                    -fx-font-family: 'Microsoft YaHei';
+                    -fx-font-size: 10px;
+                    -fx-legend-visible: true;
+                    -fx-pie-label-visible: true;"/>
+    </HBox>
 </VBox>

@@ -3,6 +3,7 @@ package org.JBR.Service;
 import io.javalin.http.Context;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.JBR.DAO.BorrowRecordDAO;
@@ -12,10 +13,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import static org.JBR.Utils.Utils.createErrorResponse;
 import org.JBR.Utils.JwtUtil;
 
-public class BorrowRecordsController {
+public class BorrowRecordsService {
+
     public static void getAllRecords(Context ctx) {
         BorrowRecordDAO borrowRecordDAO = new BorrowRecordDAO("library.db");
-        // TODO: extractUserInfo
         String userId = JwtUtil.extractUserInfo(ctx.req().getHeader("Authorization")).get("user_id");
         String role = JwtUtil.extractUserInfo(ctx.req().getHeader("Authorization")).get("role");
         try {
@@ -96,18 +97,6 @@ public class BorrowRecordsController {
             borrowRecordDAO.close();
         }
     }
-    public static void getUserBorrowRecords(Context ctx) {
-        BorrowRecordDAO borrowRecordDAO = new BorrowRecordDAO("library.db");
-        try {
-            JsonNode requestBody = ctx.bodyAsClass(JsonNode.class);
-            String userId = requestBody.path("user_id").asText();
-            ctx.json(borrowRecordDAO.getBorrowRecordsByUser(userId));
-        } catch (Exception e) {
-            ctx.status(500).json(createErrorResponse("Failed to retrieve borrow records for user: " + e.getMessage()));
-        } finally {
-            borrowRecordDAO.close();
-        }
-    }
 
     public static void returnBook(Context ctx) {
         BorrowRecordDAO borrowRecordDAO = new BorrowRecordDAO("library.db");
@@ -127,6 +116,16 @@ public class BorrowRecordsController {
         }
     }
 
-    
+    public static void getStatistics(Context ctx) {
+        BorrowRecordDAO borrowRecordDAO = new BorrowRecordDAO("library.db");
+        try {
+            List<Map<String, Object>> statistics = borrowRecordDAO.getBorrowStatistics();
+            ctx.json(Map.of("success", true, "statistics", statistics,"message", "Borrow statistics retrieved successfully"));
+        } catch (Exception e) {
+            ctx.status(500).json(createErrorResponse("Failed to retrieve statistics: " + e.getMessage()));
+        } finally {
+            borrowRecordDAO.close();
+        }
+    }
     
 }

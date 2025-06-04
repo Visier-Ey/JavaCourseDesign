@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import static org.JBR.Utils.Utils.createErrorResponse;;
 
-public class UserController {
+public class UserService {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final String DB_PATH = "library.db"; // 数据库路径
 

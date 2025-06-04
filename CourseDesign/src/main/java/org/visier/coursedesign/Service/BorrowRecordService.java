@@ -39,4 +39,9 @@ public class BorrowRecordService {
         return new JSONObject(response);
     }
 
+    public static JSONObject getBorrowStatistics() throws Exception {
+        String response = ApiClient.sendRequest("GET", "/borrow-records/statistics", "");
+        return new JSONObject(response);
+    }
+
 }

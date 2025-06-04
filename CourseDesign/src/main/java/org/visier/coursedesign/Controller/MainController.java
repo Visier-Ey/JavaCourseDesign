@@ -6,7 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 
 import java.io.IOException;
-
+import org.visier.coursedesign.Utils.Utils;
 import org.visier.coursedesign.Manager.SceneManager;
 import org.visier.coursedesign.Session.UserSession;
 
@@ -35,7 +35,7 @@ public class MainController {
         dashboardButton.setOnAction(e -> loadView("dashboard"));
         booksButton.setOnAction(e -> loadView("booksManagement"));
         usersButton.setOnAction(e -> loadView("userManagement"));
-        recordsButton.setOnAction(e -> loadView("borrowRecords"));
+        recordsButton.setOnAction(e -> loadView("borrowRecordsManagement"));
     }
 
     public void setVisible(){
@@ -61,7 +61,7 @@ public class MainController {
             contentPane.getChildren().add(view);
         } catch (IOException e) {
             e.printStackTrace();
-            // TODO: Handle the error gracefully, maybe show an alert
+            Utils.showErrorAlert("Error", "Failed to load view: " + viewName);
         }
     }
 }
