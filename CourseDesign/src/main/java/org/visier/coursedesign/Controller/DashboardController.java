@@ -6,9 +6,12 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.visier.coursedesign.Service.BorrowRecordService;
+import org.visier.coursedesign.Session.UserSession;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -19,25 +22,35 @@ public class DashboardController {
     @FXML
     private Button statsButton;
     @FXML
-    private HBox chartContainer;
+    private VBox adminChartContainer;
+    @FXML
+    private VBox userChartContainer;
     @FXML
     private BarChart<String, Number> barChart;
     @FXML
     private PieChart pieChart;
 
+
     @FXML
     private void initialize() {
         statsButton.setOnAction(event -> toggleStatistics());
+ 
     }
 
     private void toggleStatistics() {
-        if (chartContainer.isVisible()) {
-            chartContainer.setVisible(false);
-            statsButton.setText("View Statistics");
-        } else {
+        if(UserSession.getCurrentUser().getRole().equals("ADMIN")) {
+             adminChartContainer.setVisible(true);
+             adminChartContainer.setManaged(true);
+            userChartContainer.setVisible(false);
+            userChartContainer.setManaged(false);
             loadStatistics();
-            chartContainer.setVisible(true);
-            statsButton.setText("Hide Statistics");
+            statsButton.setVisible(true);
+        } else {
+            statsButton.setVisible(false);
+            adminChartContainer.setManaged(false);
+            adminChartContainer.setVisible(false);
+            userChartContainer.setManaged(true);
+            userChartContainer.setVisible(true);
         }
     }
 

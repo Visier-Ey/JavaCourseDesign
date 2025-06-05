@@ -44,7 +44,8 @@ public class BooksManagementController {
     private TableColumn<Book, Boolean> availableColumn;
     @FXML
     private TableColumn<Book, Void> actionsColumn;
-
+    @FXML
+    private ComboBox<String> searchTypeComboBox;
     // 书籍数据列表
     private ObservableList<Book> bookList = FXCollections.observableArrayList();
 
@@ -57,7 +58,8 @@ public class BooksManagementController {
         authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
         isbnColumn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
         availableColumn.setCellValueFactory(new PropertyValueFactory<>("available"));
-
+        searchTypeComboBox.getItems().addAll("Title", "Author", "ISBN");
+        searchTypeComboBox.getSelectionModel().selectFirst();
         // 设置表格数据
         booksTable.setItems(bookList);
 

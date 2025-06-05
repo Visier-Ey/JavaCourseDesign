@@ -13,34 +13,60 @@
     <Button text="View Statistics" fx:id="statsButton" 
             style="-fx-font-size: 14px; -fx-pref-width: 200;"/>
 
-    <!-- Chart Container - Holds the statistical charts -->
-    <HBox fx:id="chartContainer" visible="false" spacing="40" alignment="CENTER" 
-          style="-fx-padding: 20; -fx-background-color: #f5f5f5;">
+    <!-- 管理员专属图表容器 (ADMIN) -->
+    <VBox fx:id="adminChartContainer" managed="false" visible="false" spacing="20" alignment="CENTER">
+        <Label text="Administrator View" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+        <HBox spacing="40" alignment="CENTER" style="-fx-padding: 20;">
+            <BarChart fx:id="barChart" title="Book Borrowing Statistics" 
+                     minWidth="500" minHeight="400" prefWidth="500" prefHeight="400"
+                     legendVisible="false" animated="false"
+                     style="
+                        -fx-bar-gap: 5px;
+                        -fx-category-gap: 30px;
+                        -fx-font-family: 'Microsoft YaHei';
+                        -fx-font-size: 12px;">
+                <xAxis>
+                    <CategoryAxis label="Book Title" />
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="Borrow Count" />
+                </yAxis>
+            </BarChart>
 
-        <!-- Bar Chart - Increase size and remove legend -->
-        <BarChart fx:id="barChart" title="Book Borrowing Statistics" 
-                 minWidth="500" minHeight="400" prefWidth="500" prefHeight="400"
-                 legendVisible="false" animated="false"
-                 style="
-                    -fx-bar-gap: 5px;
-                    -fx-category-gap: 30px;
-                    -fx-font-family: 'Microsoft YaHei';
-                    -fx-font-size: 12px;">
-            <xAxis>
-                <CategoryAxis label="Book Title" />
-            </xAxis>
-            <yAxis>
-                <NumberAxis label="Borrow Count" />
-            </yAxis>
-        </BarChart>
+            <PieChart fx:id="pieChart" title="The Popularity of Books" 
+                      minWidth="100" minHeight="150" 
+                      legendVisible="true"  style="
+                        -fx-font-family: 'Microsoft YaHei';
+                        -fx-font-size: 10px;
+                        -fx-legend-visible: true;
+                        -fx-pie-label-visible: true;"/>
+        </HBox>
+    </VBox>
 
-        <!-- Pie Chart - Increase size and add legend -->
-        <PieChart fx:id="pieChart" title="The Popularity of Books" 
-                  minWidth="100" minHeight="150" 
-                  legendVisible="true"  style="
-                    -fx-font-family: 'Microsoft YaHei';
-                    -fx-font-size: 10px;
-                    -fx-legend-visible: true;
-                    -fx-pie-label-visible: true;"/>
-    </HBox>
+    <!-- 普通用户专属图表容器 (USER) -->
+    <VBox fx:id="userChartContainer" managed="false" visible="false" spacing="20" alignment="CENTER">
+        <Label text="Recommended For You" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+        <HBox spacing="40" alignment="CENTER" style="-fx-padding: 20;">
+            <!-- 用户专属饼图 -->
+            <PieChart fx:id="userPieChart" title="Your Reading Preferences" 
+                      minWidth="400" minHeight="400" 
+                      legendVisible="true" style="
+                        -fx-font-family: 'Microsoft YaHei';
+                        -fx-pie-label-visible: true;">
+            </PieChart>
+            
+            <!-- 用户专属条形图 -->
+            <BarChart fx:id="userBarChart" title="Recommended Books" 
+                     minWidth="400" minHeight="400"
+                     legendVisible="false" animated="false"
+                     style="-fx-font-family: 'Microsoft YaHei';">
+                <xAxis>
+                    <CategoryAxis label="Recommended Titles" />
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="Recommendation Score" />
+                </yAxis>
+            </BarChart>
+        </HBox>
+    </VBox>
 </VBox>

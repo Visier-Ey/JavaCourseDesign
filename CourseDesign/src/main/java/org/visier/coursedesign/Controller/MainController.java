@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
+import javafx.scene.control.Label;
 
 import java.io.IOException;
 import org.visier.coursedesign.Utils.Utils;
@@ -30,7 +31,7 @@ public class MainController {
 
     @FXML
     private void initialize() {
-        //* register the button actions */
+        // * register the button actions */
         logoutButton.setOnAction(e -> handleLogout());
         dashboardButton.setOnAction(e -> loadView("dashboard"));
         booksButton.setOnAction(e -> loadView("booksManagement"));
@@ -38,25 +39,30 @@ public class MainController {
         recordsButton.setOnAction(e -> loadView("borrowRecordsManagement"));
     }
 
-    public void setVisible(){
+    public void setVisible() {
+        System.out.println("Login Role: " + UserSession.getCurrentUser().getRole());
         usersButton.setVisible(UserSession.getCurrentUser().getRole().equals("ADMIN"));
     }
 
     private void handleLogout() {
-        //* Switch to the login scene */
         SceneManager.switchTo("login");
+        contentPane.getChildren().clear();
+
+        Label welcomeLabel = new Label("Welcome to Library Management System");
+        welcomeLabel.setStyle("-fx-font-size: 18px;");
+        contentPane.getChildren().add(welcomeLabel);
     }
 
     private void loadView(String viewName) {
         try {
-            //* Load the corresponding FXML file */
+            // * Load the corresponding FXML file */
             String fxmlFile = "/org/visier/coursedesign/" + viewName + ".fxml";
             URL fxmlUrl = getClass().getResource(fxmlFile);
             if (fxmlUrl == null) {
                 throw new RuntimeException("Cannot find FXML file for: " + viewName);
             }
             Node view = FXMLLoader.load(fxmlUrl);
-            //* Clear existing content and add new content */
+            // * Clear existing content and add new content */
             contentPane.getChildren().clear();
             contentPane.getChildren().add(view);
         } catch (IOException e) {

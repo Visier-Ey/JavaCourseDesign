@@ -219,8 +219,6 @@ public class UserManagementController {
         grid.setVgap(10);
         grid.setPadding(new Insets(20));
 
-        TextField userIdField = new TextField();
-        userIdField.setPromptText("User ID");
         TextField usernameField = new TextField();
         usernameField.setPromptText("Username");
         PasswordField passwordField = new PasswordField();
@@ -229,17 +227,12 @@ public class UserManagementController {
         roleCombo.getItems().addAll("NORMAL", "ADMIN");
 
         if (user != null) {
-            userIdField.setText(user.getUserId());
             usernameField.setText(user.getUsername());
             roleCombo.setValue(user.getRole());
-            userIdField.setDisable(true);
             roleCombo.setDisable(!isCurrentUserAdmin());
         } else {
             roleCombo.setValue("NORMAL");
         }
-
-        grid.add(new Label("User ID:"), 0, 0);
-        grid.add(userIdField, 1, 0);
         grid.add(new Label("Username:"), 0, 1);
         grid.add(usernameField, 1, 1);
         grid.add(new Label("Password:"), 0, 2);
@@ -251,7 +244,7 @@ public class UserManagementController {
         }
 
         dialog.getDialogPane().setContent(grid);
-        dialog.setResultConverter(buttonType -> createUserFromDialog(buttonType, user, userIdField, usernameField,
+        dialog.setResultConverter(buttonType -> createUserFromDialog(buttonType, user, usernameField,
                 passwordField, roleCombo));
 
         processDialogResult(dialog, user);
@@ -262,18 +255,17 @@ public class UserManagementController {
     }
 
     private User createUserFromDialog(ButtonType buttonType, User user,
-            TextField userIdField, TextField usernameField,
+            TextField usernameField,
             PasswordField passwordField, ComboBox<String> roleCombo) {
         if (buttonType == ButtonType.OK) {
-            String userId = userIdField.getText();
             String username = usernameField.getText();
             String password = passwordField.getText();
             String role = roleCombo.getValue();
 
             if (user == null) {
                 return "ADMIN".equals(role)
-                        ? new Admin(userId, username, password, false)
-                        : new NormalUser(userId, username, password, false);
+                        ? new Admin("userId", username, password, false)
+                        : new NormalUser("userId", username, password, false);
             } else {
                 user.setUsername(username);
                 if (!password.isEmpty()) {

@@ -4,6 +4,7 @@ import org.JBR.Sqlite.SQLiteHelper;
 import org.mindrot.jbcrypt.BCrypt;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.sql.SQLException;
 
 /**
@@ -199,4 +200,70 @@ public class UserDAO {
             return false;
         }
     }
+    /**
+     * get user recommendations
+     * @param userId the user ID to get recommendations for
+     * @return a map of recommended books or null if not found  
+     */
+    public Map<String, Object> getUserRecommendations(String userId) {
+    Map<String, Object> recommendations = new HashMap<>();
+    
+    try {
+        // Get top 5 most popular books in the library
+        List<Map<String, Object>> popularBooks = dbHelper.executeQuery("""
+            SELECT b.book_id, b.title, b.author, COUNT(br.record_id) as borrow_count
+            FROM books b
+            LEFT JOIN borrow_records br ON b.book_id = br.book_id
+            GROUP BY b.book_id
+            ORDER BY borrow_count DESC
+            LIMIT 5
+            """);
+        
+        // Calculate total borrow count for percentage calculation
+        int totalBorrows = dbHelper.executeQueryForSingleInt("""
+            SELECT COUNT(*) FROM borrow_records
+            """);
+        
+        // Add percentage to each popular book
+        for (Map<String, Object> book : popularBooks) {
+            int borrowCount = ((Number) book.get("borrow_count")).intValue();
+            double percentage = totalBorrows > 0 ? (borrowCount * 100.0 / totalBorrows) : 0;
+            book.put("percentage", Math.round(percentage * 10) / 10.0); // Round to 1 decimal place
+        }
+        
+        // Get top 5 books the user has borrowed most
+        List<Map<String, Object>> userBooks = dbHelper.executeQuery("""
+            SELECT b.book_id, b.title, b.author, COUNT(br.record_id) as borrow_count
+            FROM books b
+            JOIN borrow_records br ON b.book_id = br.book_id
+            WHERE br.user_id = ?
+            GROUP BY b.book_id
+            ORDER BY borrow_count DESC
+            LIMIT 5
+            """, userId);
+        
+        // Calculate user's total borrow count for percentage
+        int userTotalBorrows = dbHelper.executeQueryForSingleInt("""
+            SELECT COUNT(*) FROM borrow_records WHERE user_id = ?
+            """, userId);
+        
+        // Add percentage to each user book
+        for (Map<String, Object> book : userBooks) {
+            int borrowCount = ((Number) book.get("borrow_count")).intValue();
+            double percentage = userTotalBorrows > 0 ? (borrowCount * 100.0 / userTotalBorrows) : 0;
+            book.put("percentage", Math.round(percentage * 10) / 10.0); // Round to 1 decimal place
+        }
+        
+        recommendations.put("popular_books", popularBooks);
+        recommendations.put("user_books", userBooks);
+        recommendations.put("total_borrows", totalBorrows);
+        recommendations.put("user_total_borrows", userTotalBorrows);
+        
+    } catch (SQLException e) {
+        System.err.println("Get recommendations failed: " + e.getMessage());
+        recommendations.put("error", "Failed to get recommendations");
+    }
+    
+    return recommendations;
+}
 }

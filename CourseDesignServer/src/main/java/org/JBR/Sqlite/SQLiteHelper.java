@@ -190,6 +190,19 @@ public class SQLiteHelper {
         }
     }
 
+    public int executeQueryForSingleInt(String sql, Object... params) throws SQLException {
+    try (Connection conn = getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        setParameters(stmt, params);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
+        }
+    }
+}
+
     /**
      * 事务操作接口
      */

@@ -22,6 +22,7 @@
 
     <HBox spacing="10" alignment="CENTER_LEFT">
         <TextField fx:id="searchField" promptText="Search books..." prefWidth="300"/>
+        <ComboBox fx:id="searchTypeComboBox" prefWidth="80"/>
         <Button text="Search" fx:id="searchButton"/>
         <Button text="Add Book" fx:id="addButton"/>
     </HBox>

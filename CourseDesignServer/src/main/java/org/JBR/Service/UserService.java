@@ -2,9 +2,12 @@ package org.JBR.Service;
 
 import org.JBR.DAO.UserDAO;
 import org.JBR.Utils.JwtUtil;
+import org.JBR.Utils.Utils;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.http.Context;
+import io.javalin.util.Util;
 import io.javalin.websocket.WsConfig;
 import java.util.HashMap;
 import java.util.Map;
@@ -227,6 +230,24 @@ public class UserService {
             }
         } catch (Exception e) {
             ctx.status(500).json(createErrorResponse("Failed to promote user: " + e.getMessage()));
+        } finally {
+            userDAO.close();
+        }
+    }
+
+    public static void getUserRecommendations(Context ctx) {
+        UserDAO userDAO = new UserDAO(DB_PATH);
+        try {
+            String userId = JwtUtil.extractUserInfo(ctx.req().getHeader("Authorization")).get("user_id");
+            Map<String, Object> recommendations = userDAO.getUserRecommendations(userId);
+            if (recommendations != null) {
+                ctx.status(200).json(Map.of("success", true, "recommendations", recommendations));
+            } else {
+                ctx.status(404).json(createErrorResponse("No recommendations found for this user"));
+            }
+        } catch (Exception e) {
+            ctx.status(500).json(createErrorResponse("Failed to get recommendations: " + e.getMessage()));
+            e.printStackTrace();
         } finally {
             userDAO.close();
         }

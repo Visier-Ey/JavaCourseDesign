@@ -25,7 +25,6 @@
 
     <center>
         <StackPane fx:id="contentPane">
-            <!-- 动态内容将在这里加载 -->
             <Label text="Welcome to Library Management System" style="-fx-font-size: 18px;"/>
         </StackPane>
     </center>

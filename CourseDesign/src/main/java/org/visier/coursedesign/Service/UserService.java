@@ -57,4 +57,8 @@ public final class UserService {
         String response = ApiClient.sendRequest("PATCH", "/users/" + userId + "/promote", "");
         return new JSONObject(response);
     }
+    public static JSONObject getUserRecommendations() throws Exception {
+        String response = ApiClient.sendRequest("GET", "/users/recommend", "");
+        return new JSONObject(response);
+    }
 }

@@ -17,6 +17,16 @@ public class JavalinServer {
                                 path("/users", () -> {
                                     get(UserService::getAllUsers);
                                     post(UserService::createUser);
+                                    path("/recommend",() -> {
+                                        get(UserService::getUserRecommendations);
+                                    });
+                                    ws("/events", UserService::webSocketEvents);
+                                    path("/login", () -> {
+                                        post(UserService::login);
+                                    });
+                                    path("/register", () -> {
+                                        post(UserService::register);
+                                    });
                                     path("/{id}", () -> {
                                         get(UserService::getUser);
                                         patch(UserService::updateUser);
@@ -27,16 +37,9 @@ public class JavalinServer {
                                         path("unfreeze", () -> {
                                             patch(UserService::unfreezeUser);
                                         });
-                                        path("/promote", () -> {
+                                        path("promote", () -> {
                                             patch(UserService::promoteUser);
                                         });
-                                    });
-                                    ws("/events", UserService::webSocketEvents);
-                                    path("/login", () -> {
-                                        post(UserService::login);
-                                    });
-                                    path("/register", () -> {
-                                        post(UserService::register);
                                     });
                                 });
                                 // ! Book Management Routes

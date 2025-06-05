@@ -43,6 +43,9 @@ graph LR
     
     PATCH_promote["PATCH /users/{id}/promote"] --> UserService.promoteUser
     PromoteUser --> PATCH_promote
+
+    GET_Recommendation["/users/recommend"] --> UserService.getUserRecommendations
+    Users --> GET_Recommendation
     
     UserEvents["/users/events"]
     Users --> UserEvents

@@ -18,8 +18,10 @@
                 </effect>
             </Text>
             
-            <TabPane maxWidth="1000" prefWidth="400" tabClosingPolicy="UNAVAILABLE" style="-fx-background-color: transparent;">
+            <TabPane maxWidth="1000" prefWidth="450" tabClosingPolicy="UNAVAILABLE" 
+                     style="-fx-background-color: transparent; -fx-tab-min-width: 100px;">
                 <tabs>
+                    <!-- Login Tab -->
                     <Tab text="Login" style="-fx-font-size: 14px;">
                         <content>
                             <VBox spacing="20" alignment="CENTER" style="-fx-padding: 30; -fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 0);">
@@ -35,9 +37,12 @@
                                     <Label text="Password:" style="-fx-font-size: 14px; -fx-text-fill: #2c3e50;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                                     <PasswordField fx:id="passwordField" promptText="Enter password" style="-fx-font-size: 14px;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
                                 </GridPane>
-
                                 <Button text="Login" fx:id="loginButton" defaultButton="true"
-                                        style="-fx-font-size: 14px; -fx-pref-width: 150px; -fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5;"/>
+                                        style="-fx-font-size: 14px; -fx-pref-width: 150px; -fx-padding: 5px 0; -fx-background-color: linear-gradient(to right, #3498db, #2980b9); -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;">
+                                    <effect>
+                                        <DropShadow color="rgba(52,152,219,0.5)" radius="5" spread="0.2"/>
+                                    </effect>
+                                </Button>
                                 
                                 <Label fx:id="errorLabel" style="-fx-text-fill: #e74c3c; -fx-font-size: 13px;" visible="false" wrapText="true" maxWidth="350"/>
                             </VBox>
@@ -64,7 +69,11 @@
                                 </GridPane>
 
                                 <Button text="Register" fx:id="registerButton"
-                                        style="-fx-font-size: 14px; -fx-pref-width: 150px; -fx-background-color: #2ecc71; -fx-text-fill: white; -fx-background-radius: 5;"/>
+                                        style="-fx-font-size: 14px; -fx-pref-width: 150px; -fx-padding: 5px 0; -fx-background-color: linear-gradient(to right, #2ecc71, #27ae60); -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;">
+                                    <effect>
+                                        <DropShadow color="rgba(46,204,113,0.5)" radius="5" spread="0.2"/>
+                                    </effect>
+                                </Button>
                                 
                                 <Label fx:id="regErrorLabel" style="-fx-text-fill: #e74c3c; -fx-font-size: 13px;" visible="false" wrapText="true" maxWidth="350"/>
                             </VBox>
