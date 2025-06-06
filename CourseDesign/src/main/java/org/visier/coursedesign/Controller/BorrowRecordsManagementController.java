@@ -181,6 +181,7 @@ public class BorrowRecordsManagementController {
             if (response.getBoolean("success")) {
                 record.setStatus("RETURNED");
                 recordsTable.refresh();
+                Utils.showSuccessAlert("Success", "Book returned successfully");
             } else {
                 Utils.showErrorAlert("Error", "Failed to return book: " + response.getString("error"));
             }
@@ -196,6 +197,7 @@ public class BorrowRecordsManagementController {
             if (response.getBoolean("success")) {
                 recordList.remove(record);
                 recordsTable.refresh();
+                Utils.showSuccessAlert("Success", "Record deleted successfully");
             } else {
                 Utils.showErrorAlert("Error", "Failed to delete record: " + response.getString("error"));
             }

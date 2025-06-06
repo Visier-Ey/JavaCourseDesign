@@ -135,7 +135,7 @@ public class BooksManagementController {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            // showAlert("Error", "Failed to load books: " + e.getMessage());
+            Utils.showErrorAlert("Error", "Failed to load books: " + e.getMessage());
         }
     }
 
@@ -232,15 +232,14 @@ public class BooksManagementController {
             if (response.getBoolean("success")) {
                 book.setAvailable(false);
                 booksTable.refresh();
-                // showAlert("Success", "Book borrowed successfully.");
+                Utils.showSuccessAlert("Success", "Book borrowed successfully.");
             } else {
-                // showAlert("Error", "Failed to borrow book: " +
-                // response.getString("message"));
-                System.out.println("Failed to borrow book: " + response.getString("error"));
+                Utils.showErrorAlert("Error", "Failed to borrow book: " +
+                        response.getString("message"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            // showAlert("Error", "Failed to borrow book: " + e.getMessage());
+            Utils.showErrorAlert("Error", "Failed to borrow book: " + e.getMessage());
         }
     }
 

@@ -11,7 +11,7 @@
             style="-fx-background-color: #f5f7fa;">
     <center>
         <VBox alignment="CENTER" spacing="20" prefWidth="450">
-            <Text text="Library Management System" 
+            <Text text="VISIER Library System" 
                   style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-fill: linear-gradient(to right, #2c3e50, #3498db);">
                 <effect>
                     <DropShadow color="#3498db80" radius="10" spread="0.2"/>

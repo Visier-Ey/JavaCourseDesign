@@ -14,7 +14,7 @@
     <spacing>10</spacing>
     
     <HBox alignment="CENTER_LEFT" spacing="10">
-        <Label text="Books Management" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+        <Label text="Books View" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
         <Label fx:id="currentUserLabel" style="-fx-font-style: italic;"/>
     </HBox>
     

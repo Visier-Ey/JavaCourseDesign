@@ -8,6 +8,7 @@ import org.visier.coursedesign.Entity.User;
 import org.visier.coursedesign.Manager.SceneManager;
 import org.visier.coursedesign.Service.UserService;
 import org.visier.coursedesign.Session.UserSession;
+import org.visier.coursedesign.Utils.Utils;
 
 public class LoginController {
     // Login components
@@ -65,6 +66,7 @@ public class LoginController {
                 User user = new User(response.getString("user_id"), username);
                 user.setRole(response.getString("role"));
                 UserSession.setCurrentUser(user);
+                Utils.showSuccessAlert("Login successful", "Welcome back, " + username + "!");
                 SceneManager.switchTo("main", controller -> {
                     if (controller instanceof MainController) {
                         ((MainController) controller).setVisible();
@@ -105,6 +107,7 @@ public class LoginController {
             JSONObject response = UserService.registerUser(userJson.toString());
             if (response.getBoolean("success")) {
                 handleSuccessfulRegistration();
+                Utils.showSuccessAlert("Success", "User registered successfully!");
             } else {
                 showRegistrationError(response.getString("error"));
             }

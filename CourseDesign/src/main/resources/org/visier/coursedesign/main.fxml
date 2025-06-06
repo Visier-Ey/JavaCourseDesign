@@ -8,7 +8,7 @@
             fx:controller="org.visier.coursedesign.Controller.MainController">
     <top>
         <HBox style="-fx-background-color: #2a5058; -fx-padding: 10;">
-            <Text text="Library Management System" fill="WHITE" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <Text text="VISIER Library System" fill="WHITE" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Button text="Logout" fx:id="logoutButton" style="-fx-text-fill: white; -fx-background-color: #3a6b75;"/>
         </HBox>
@@ -17,15 +17,15 @@
     <left>
         <VBox style="-fx-background-color: #f4f4f4; -fx-padding: 10; -fx-spacing: 10;" prefWidth="200">
             <Button text="Dashboard" fx:id="dashboardButton" style="-fx-pref-width: 180px;"/>
-            <Button text="Books Management" fx:id="booksButton" style="-fx-pref-width: 180px;"/>
-            <Button text="Borrow Records Management" fx:id="recordsButton" style="-fx-pref-width: 180px;"/>
-            <Button text="User Management" fx:id="usersButton" style="-fx-pref-width: 180px;"/>
+            <Button text="Books View" fx:id="booksButton" style="-fx-pref-width: 180px;"/>
+            <Button text="Borrow Records View" fx:id="recordsButton" style="-fx-pref-width: 180px;"/>
+            <Button text="User View" fx:id="usersButton" style="-fx-pref-width: 180px;"/>
         </VBox>
     </left>
 
     <center>
         <StackPane fx:id="contentPane">
-            <Label text="Welcome to Library Management System" style="-fx-font-size: 18px;"/>
+            <Label text="Welcome to VISIER Library System" style="-fx-font-size: 18px;"/>
         </StackPane>
     </center>
 </BorderPane>

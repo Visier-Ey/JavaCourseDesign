@@ -4,13 +4,24 @@ import org.JBR.Service.*;
 
 import io.javalin.Javalin;
 import static io.javalin.apibuilder.ApiBuilder.*;
+
+import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.JBR.Utils.JwtUtil;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 public class JavalinServer {
+
+    private static final QueuedThreadPool threadPool = new QueuedThreadPool(500, 50, 6000);
+
     public static void run() {
         // ! Javalin Server Initialization
         Javalin app = Javalin.create(
                 config -> {
+                    // ! Thread Pool Configuration
+                    config.jetty.threadPool = threadPool;
                     config.router.apiBuilder(
                             () -> {
                                 // ! User Management Routes

@@ -44,29 +44,61 @@
     </VBox>
 
     <!-- 普通用户专属图表容器 (USER) -->
-    <VBox fx:id="userChartContainer" managed="false" visible="false" spacing="20" alignment="CENTER">
-        <Label text="Recommended For You" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
-        <HBox spacing="40" alignment="CENTER" style="-fx-padding: 20;">
-            <!-- 用户专属饼图 -->
-            <PieChart fx:id="userPieChart" title="Your Reading Preferences" 
-                      minWidth="400" minHeight="400" 
-                      legendVisible="true" style="
-                        -fx-font-family: 'Microsoft YaHei';
-                        -fx-pie-label-visible: true;">
-            </PieChart>
+    <VBox fx:id="userChartContainer" managed="false" visible="false" spacing="20" alignment="CENTER" minWidth="800">
+    <Label text="Recommended For You" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+    <HBox spacing="40" alignment="CENTER" style="-fx-padding: 20;">
+        <!-- 左侧：饼状图 -->
+        <PieChart fx:id="userPieChart" title="Your Reading Preferences" 
+                  minWidth="400" minHeight="400" 
+                  legendVisible="true" style="
+                    -fx-font-family: 'Microsoft YaHei';
+                    -fx-pie-label-visible: true;">
+        </PieChart>
+        
+<VBox fx:id="carouselContainer" minWidth="800" minHeight="450" 
+      alignment="CENTER" spacing="15"
+      style="-fx-padding: 20; -fx-border-radius: 15;">
+    
+    <!-- 标题样式更醒目 -->
+    <Label text="✨ Top Picks For You ✨" 
+           style="-fx-font-weight: bold; -fx-font-size: 18px; -fx-text-fill: #4a4a8a; -fx-effect: dropshadow(gaussian, #aaa, 2, 0.5, 0, 1);"/>
+    
+    <!-- 轮播内容区域 - 使用HBox容纳三本书 -->
+    <HBox fx:id="carouselPane" alignment="CENTER" spacing="0" 
+          minWidth="550" minHeight="350"
+          style="-fx-background-color: transparent;">
+        
+        <!-- 左侧书 (低一些) -->
+        <VBox fx:id="leftBook" alignment="BOTTOM_CENTER" spacing="10" 
+              style="-fx-padding: 0 10 20 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0.3, 0, 2);">
+            <Label text="Book Title 1" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #555;"/>
+        </VBox>
+        
+        <!-- 中间书 (高一些，突出显示) -->
+        <VBox fx:id="centerBook" alignment="CENTER" spacing="10" 
+              style="-fx-padding: 0 15 0 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0.5, 0, 4);">
             
-            <!-- 用户专属条形图 -->
-            <BarChart fx:id="userBarChart" title="Recommended Books" 
-                     minWidth="400" minHeight="400"
-                     legendVisible="false" animated="false"
-                     style="-fx-font-family: 'Microsoft YaHei';">
-                <xAxis>
-                    <CategoryAxis label="Recommended Titles" />
-                </xAxis>
-                <yAxis>
-                    <NumberAxis label="Recommendation Score" />
-                </yAxis>
-            </BarChart>
-        </HBox>
-    </VBox>
+            <Label text="Book Title 2" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+            <Label text="⭐ 4.8/5" style="-fx-font-size: 12px; -fx-text-fill: #ff9900;"/>
+        </VBox>
+        
+        <!-- 右侧书 (低一些) -->
+        <VBox fx:id="rightBook" alignment="BOTTOM_CENTER" spacing="10" 
+              style="-fx-padding: 0 10 20 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0.3, 0, 2);">
+           
+            <Label text="Book Title 3" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #555;"/>
+        </VBox>
+    </HBox>
+    
+    <!-- 轮播控制按钮 - 更生动的样式 -->
+    <HBox spacing="20" alignment="CENTER">
+        <Button text="◀ PREV" onAction="#previousCarouselItem" 
+               style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: white; -fx-background-color: #6a5acd; -fx-background-radius: 15; -fx-padding: 5 15 5 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 1);"/>
+        
+        <Button text="NEXT ▶" onAction="#nextCarouselItem" 
+               style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: white; -fx-background-color: #6a5acd; -fx-background-radius: 15; -fx-padding: 5 15 5 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 1);"/>
+    </HBox>
+</VBox>
+    </HBox>
+</VBox>
 </VBox>

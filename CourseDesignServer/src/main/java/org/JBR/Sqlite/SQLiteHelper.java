@@ -15,49 +15,39 @@ import java.util.List;
 import java.util.Map;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 /**
- * SQLite 数据库操作封装类
+ * SQLite 
  */
 public class SQLiteHelper {
-    private final String dbPath;
-    private Connection connection;
+    private final HikariDataSource dataSource;
+    private static final DateTimeFormatter DATE_FORMATTER = 
+        DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    /**
-     * 构造函数
-     * @param dbPath 数据库文件路径（相对或绝对路径）
-     */
     public SQLiteHelper(String dbPath) {
-        this.dbPath = dbPath;
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:sqlite:" + dbPath);
+        config.setMaximumPoolSize(10);
+        this.dataSource = new HikariDataSource(config);
     }
 
-    /**
-     * 获取数据库连接
-     * @return Connection 对象
-     * @throws SQLException 如果连接失败
-     */
     public Connection getConnection() throws SQLException {
-        if (connection == null || connection.isClosed()) {
-            connection = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
-            // 启用外键约束
-            try (Statement stmt = connection.createStatement()) {
-                stmt.execute("PRAGMA foreign_keys = ON");
-            }
+        Connection conn = dataSource.getConnection();
+        try (Statement stmt = conn.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON");
         }
-        return connection;
+        return conn;
     }
 
     /**
      * 关闭数据库连接
      */
     public void close() {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-            }
-        } catch (SQLException e) {
-            System.err.println("Error when close: " + e.getMessage());
-        }
+       //Error! Exception Function
     }
 
     /**

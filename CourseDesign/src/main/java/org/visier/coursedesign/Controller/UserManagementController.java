@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import org.visier.coursedesign.Entity.*;
 import java.util.Optional;
 import org.visier.coursedesign.Service.UserService;
+import org.visier.coursedesign.Utils.Utils;
 
 public class UserManagementController {
     @FXML
@@ -118,11 +119,11 @@ public class UserManagementController {
                     }
                 }
             } else {
-                System.err.println("Failed to load users: " + response.optString("error", "Unknown error"));
+                Utils.showErrorAlert("Error", "Failed to load users: " + response.optString("error", "Unknown error"));
             }
         } catch (Exception e) {
-            System.err.println("Error loading users: " + e.getMessage());
-            e.printStackTrace(); // 打印完整堆栈便于调试
+            e.printStackTrace();
+            Utils.showErrorAlert("Error", "Failed to load users: " + e.getMessage());
         }
     }
 
@@ -150,12 +151,13 @@ public class UserManagementController {
             if (response.getBoolean("success")) {
                 userList.remove(user);
                 usersTable.refresh();
+                Utils.showSuccessAlert("Success", "User deleted successfully.");
             } else {
-                System.err.println("Failed to delete user: " + response.optString("error", "Unknown error"));
+                Utils.showErrorAlert("Error", "Failed to delete user: " + response.optString("error", "Unknown error"));
             }
         } catch (Exception e) {
-            System.err.println("Error deleting user: " + e.getMessage());
             e.printStackTrace();
+            Utils.showErrorAlert("Error", "Failed to delete user: " + e.getMessage());
         }
     }
 
@@ -169,11 +171,11 @@ public class UserManagementController {
                 userList.set(userList.indexOf(user), updatedUser);
                 usersTable.refresh();
             } else {
-                System.err.println("Failed to promote user: " + response.optString("error", "Unknown error"));
+                Utils.showErrorAlert("Error", "Failed to promote user: " + response.optString("error", "Unknown error"));
             }
         } catch (Exception e) {
-            System.err.println("Error promoting user: " + e.getMessage());
             e.printStackTrace();
+            Utils.showErrorAlert("Error", "Failed to promote user: " + e.getMessage());
         }
     }
 
@@ -184,25 +186,13 @@ public class UserManagementController {
                 userList.set(userList.indexOf(user), new NormalUser(user.getUserId(), user.getUsername(), user.getPasswordHash(), !user.isFrozen()));
                 usersTable.refresh();
             } else {
-                System.err.println("Failed to change user status: " + response.optString("error", "Unknown error"));
+                Utils.showErrorAlert("Error", "Failed to change user status: " + response.optString("error", "Unknown error"));
             }
         } catch (Exception e) {
-            System.err.println("Error changing user status: " + e.getMessage());
             e.printStackTrace();
+            Utils.showErrorAlert("Error", "Failed to change user status: " + e.getMessage());
         }
-        
-    }
 
-    private void showConfirmationDialog(String title, String header, String content, Runnable action) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                action.run();
-            }
-        });
     }
 
     private void showUserDialog(User user) {
