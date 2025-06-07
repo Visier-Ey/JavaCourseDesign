@@ -1,3 +1,5 @@
+<br /><br />
+
 ```mermaid
 sequenceDiagram
     participant F as Frontend (CourseDesign)
